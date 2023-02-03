@@ -1,7 +1,7 @@
 ﻿**HARBOUR - Chat app**
 =====================
 
-By: Ethan Ciavolella, Shane Cleary, Evan Kaminsky, and Joseph Tommasi
+By: Ethan Ciavolella, Shane Cleary, Evan Kaminsky, and Joseph Tommasi <br>
 Scrum Master: Eric Heitmann
 
 Repository: https://github.com/Saltswimmer/ru-seniorproj
