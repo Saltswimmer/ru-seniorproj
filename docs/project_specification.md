@@ -44,9 +44,9 @@ This project hopes to:
 
 1. **Voice Chat** - VoIP support would be critical to the commercial success of this app, if it were to be made public. However for the purposes of this project it is not a top priority.
 2. A friend suggestion feature that shows the user mutual friends  
-3. Mobile applications (most likely android) - this is a big stretch since oftentimes you are developing for multiple platforms that require different codebases, however many users prefer the mobile experience for messaging.
-4. Desktop application - this is a little less of a stretch than mobile, since it will require application programming, however the only difference between platforms will be deployment packages based on CPU architecture.
-5. Fleet -  Two servers can also permanently join together in a fleet
-6. Server customization - Users can customize the look and feel of their individual servers
-7. Account linking - Ability to link accounts with other products (i.e. steam, github)
-8. Roles - Server owner can promote users within a server to be administrators, or moderators, and possibly the ability to create a hierarchy of custom roles for a server. This will require a specific system to be upheld when server merge
+3. **Mobile applications (most likely android)** - this is a big stretch since oftentimes you are developing for multiple platforms that require different codebases, however many users prefer the mobile experience for messaging.
+4. **Desktop application** - this is a little less of a stretch than mobile, since it will require application programming, however the only difference between platforms will be deployment packages based on CPU architecture.
+5. **Fleet** -  Two servers can also permanently join together in a fleet
+6. **Server customization** - Users can customize the look and feel of their individual servers
+7. **Account linking** - Ability to link accounts with other products (i.e. steam, github)
+8. **Roles** - Server owner can promote users within a server to be administrators, or moderators, and possibly the ability to create a hierarchy of custom roles for a server. This will require a specific system to be upheld when server merge
