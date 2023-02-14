@@ -1,22 +1,45 @@
 Harbour Chat App Design Document
 ================================
 #### High level Description:
+
 #### Approaches Considered:
+* REACT vs. Flutter for frontend
+
 #### Mockups:
+
 #### Screen Navigation:
+
 #### Backend Information:
+
 #### Functionality provided by each screen:
+
 #### User Authentication / Data Security Considerations:
+
 #### Tech stack:
+* __Frontend__
+  * Flutter
+    *
+* __Backend__
+  * Docker
+    * 
+  * Postgres
+    * 
+  * GraphQL
+    * 
+  * Hosting
+    * 
+* __Development Tools__
+  * Github
+    * 
 
 #### Goals and who they've been assigned to:
-* Ethan Ciavolella <ciavol43@students.rowan.edu>
-  *
-* Shane Cleary <cleary92@students.rowan.edu>
+* __Ethan Ciavolella <ciavol43@students.rowan.edu>__
   * 
-* Eric Heitmann <heitma24@students.rowan.edu>
+* __Shane Cleary <cleary92@students.rowan.edu>__
   * 
-* Evan Kaminsky <kamins39@students.rowan.edu>
+* __Eric Heitmann <heitma24@students.rowan.edu>__
   * 
-* Joseph Tommasi <tommas95@students.rowan.edu>
+* __Evan Kaminsky <kamins39@students.rowan.edu>__
+  * 
+* __Joseph Tommasi <tommas95@students.rowan.edu>__
   * 
