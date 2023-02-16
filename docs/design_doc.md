@@ -7,6 +7,18 @@ Harbour Chat App Design Document
 
 #### Mockups:
 
+![image](images/m_login.png "Login screen")
+
+![image](images/m_signup.png "Sign up screen")
+
+![image](images/m_verify.png "Email verification screen")
+
+![image](images/m_firsttime.png "First time user screen")
+
+![image](images/m_main.png "Main view")
+
+![image](images/m_browse.png "Browse view")
+
 #### Screen Navigation:
 
 #### Backend Information:
