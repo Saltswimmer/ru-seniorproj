@@ -1,7 +1,12 @@
 Harbour Chat App Design Document
 ================================
 #### High level Description:
-
+* Harbour is a group chat application
+* The game will start with a web application and hopes to include desktop and mobile applications
+* After signing up and logging in, users will be able to join multiple "vessels" or group chats
+* These "vessels" may be temporarily merged together, aka "boarding"
+* Vessels may also be permanently merged, known as a "fleet"
+* Users will also have the option to customize their personal profile, vessels, and client
 #### Approaches Considered:
 * REACT vs. Flutter for frontend
 
