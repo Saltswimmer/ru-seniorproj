@@ -21,6 +21,8 @@ Harbour Chat App Design Document
 
 #### Screen Navigation:
 
+![image](images/m_navigation.png "Screen navigation")
+
 #### Backend Information:
 
 #### Functionality provided by each screen:
