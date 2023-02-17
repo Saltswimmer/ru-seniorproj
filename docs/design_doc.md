@@ -262,7 +262,7 @@ Harbour Chat App Design Document
 * __Backend__
   * Django (Python)
     * Django Channels 
-  * Docker
+  * Docker / Kubernetes
     * 
   * Postgres
     * 
