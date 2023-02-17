@@ -252,7 +252,9 @@ Harbour Chat App Design Document
 #### Functionality provided by each screen:
 
 #### User Authentication / Data Security Considerations:
-
+* Passwords must be hashed and never stored as plaintext
+* User Authentication will require email verification
+* 
 #### Tech stack:
 * __Frontend__
   * Flutter
