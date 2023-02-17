@@ -272,6 +272,10 @@ Harbour Chat App Design Document
   * Github
     * 
 
+### Database: 
+
+![image](images/ProjectSchemaDraft.png "Draft of database schema")
+
 #### Goals and who they've been assigned to:
 * __Ethan Ciavolella <ciavol43@students.rowan.edu>__
   * 
