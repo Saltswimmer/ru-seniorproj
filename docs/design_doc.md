@@ -260,7 +260,7 @@ Harbour Chat App Design Document
   * Flutter
     *
 * __Backend__
-  * Django (Python)
+  * Django (Python) or GoLang
     * Django Channels 
   * Docker / Kubernetes
     * 
