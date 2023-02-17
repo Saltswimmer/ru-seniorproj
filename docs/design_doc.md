@@ -280,8 +280,7 @@ Harbour Chat App Design Document
 
 #### Goals and who they've been assigned to:
 * __Ethan Ciavolella <ciavol43@students.rowan.edu>__
-  Frontend,
-  Database
+  Frontend
 * __Shane Cleary <cleary92@students.rowan.edu>__
   Backend,
   Database
