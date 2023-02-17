@@ -260,6 +260,8 @@ Harbour Chat App Design Document
   * Flutter
     *
 * __Backend__
+  * Django (Python)
+    * Django Channels 
   * Docker
     * 
   * Postgres
@@ -267,7 +269,7 @@ Harbour Chat App Design Document
   * GraphQL
     * 
   * Hosting
-    * 
+
 * __Development Tools__
   * Github
     * 
@@ -278,12 +280,16 @@ Harbour Chat App Design Document
 
 #### Goals and who they've been assigned to:
 * __Ethan Ciavolella <ciavol43@students.rowan.edu>__
-  * 
+  * Frontend
+  * Database
 * __Shane Cleary <cleary92@students.rowan.edu>__
-  * 
+  * Backend
+  * Database
 * __Eric Heitmann <heitma24@students.rowan.edu>__
-  * 
+  * Frontend
+  * Backend
 * __Evan Kaminsky <kamins39@students.rowan.edu>__
-  * 
+  * Dev-Ops
 * __Joseph Tommasi <tommas95@students.rowan.edu>__
-  * 
+  * Database
+  * API management
