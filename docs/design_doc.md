@@ -258,23 +258,19 @@ Harbour Chat App Design Document
 * User Authentication will require email verification
 * 
 #### Tech stack:
+* __Platform__
+  * WebApp, Mobile app, Desktop app
+* __Development Tools__
+  * Version Control: Git - hosted on Github
+  * Dependency Management: Poetry
 * __Frontend__
   * Flutter
-    *
 * __Backend__
   * GoLang
-    * Gin
   * Docker
-    * 
   * PostgreSQL
-    * 
   * GraphQL
-    * 
   * Hosting
-
-* __Development Tools__
-  * Github
-    * 
 
 ### Database: 
 
