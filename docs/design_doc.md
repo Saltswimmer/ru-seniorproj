@@ -10,6 +10,8 @@ Harbour Chat App Design Document
 #### Approaches Considered:
 * REACT vs. Flutter for frontend
   * One of our main concerns was what would be the easiest way to bring our application to multiple platforms, while still maintaining a low level of customization. We landed between REACT (which includes react router) and Flutter, both of which are excellent at building applications for multiple platforms. Ultimately we landed on Flutter, due to it's bundle size, performance, and the fact that everything is written in Dart as opposed to the multiple languages it would take to get REACT even just running. 
+* Python vs. GoLang for backend
+  * 
 #### Mockups:
 
 ![image](images/m_login.png "Login screen")
