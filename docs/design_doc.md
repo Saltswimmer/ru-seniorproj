@@ -1,18 +1,18 @@
 Harbour Chat App Design Document
 ================================
-#### High level Description:
+### High level Description:
 * Harbour is a group chat application
 * The game will start with a web application and hopes to include desktop and mobile applications
 * After signing up and logging in, users will be able to join multiple "vessels" or group chats
 * These "vessels" may be temporarily merged together, aka "boarding"
 * Vessels may also be permanently merged, known as a "fleet"
 * Users will also have the option to customize their personal profile, vessels, and client
-#### Approaches Considered:
+### Approaches Considered:
 * REACT vs. Flutter for frontend
   * One of our main concerns was what would be the easiest way to bring our application to multiple platforms, while still maintaining a low level of customization. We landed between REACT (which includes react router) and Flutter, both of which are excellent at building applications for multiple platforms. Ultimately we landed on Flutter, due to it's bundle size, performance, and the fact that everything is written in Dart as opposed to the multiple languages it would take to get REACT even just running. 
 * Python vs. Go for backend
   * While the majority of team members have experience in python, it was ultimately we decided it would be a better option to implement the backend in Go, rather than a python web framework such as Django. First and foremost, many team members expressed interest in picking up the Go language, and since most team members will touch the backend at some point it will be a good learning experience and practice. In addition, we believe Go provides a functional advantage over python in how it handles concurrency, which while a bit "overboard" for an application of this scale, allows team members to implement a functionbly reliable and scalable option.
-#### Mockups:
+### Mockups:
 
 ![image](images/m_login.png "Login screen")
 
@@ -34,8 +34,10 @@ Harbour Chat App Design Document
 
 ![image](images/m_navigation.png "Screen navigation")
 
-#### Backend Information:
-#### API Endpoints:
+### Backend Information:
+![image](images/ProjectSchemaDraft.png "Draft of database schema")
+
+### API Endpoints:
 #### User Information
 * [/api] - Returns API doucmentation
 * [/api/users/login] - Attempt to login with the given credentials
@@ -255,9 +257,9 @@ Harbour Chat App Design Document
 }
 ```
 
-#### Functionality provided by each screen:
+### Functionality provided by each screen:
 
-#### User Authentication / Data Security Considerations:
+### User Authentication / Data Security Considerations:
 * Passwords must be hashed and never stored as plaintext
 * User Authentication will require email verification
 * Login API's from other websites such as Google may also be used for user authentication
@@ -267,7 +269,7 @@ Harbour Chat App Design Document
 * Servers may select security options, such as:
   * Invitation may or may not be required
   * Ability for admins to manage/remove users or messages
-#### Tech stack:
+### Tech stack:
 * __Platform__
   * WebApp, Mobile app, Desktop app
 * __Development Tools__
@@ -282,11 +284,7 @@ Harbour Chat App Design Document
   * GraphQL
   * Hosting
 
-### Database: 
-
-![image](images/ProjectSchemaDraft.png "Draft of database schema")
-
-#### Goals and who they've been assigned to:
+### Goals and who they've been assigned to:
 * __Ethan Ciavolella <ciavol43@students.rowan.edu>__
   * Frontend
 * __Shane Cleary <cleary92@students.rowan.edu>__
