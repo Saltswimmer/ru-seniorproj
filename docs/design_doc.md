@@ -26,6 +26,10 @@ Harbour Chat App Design Document
 
 ![image](images/m_browse.png "Browse view")
 
+![image](images/m_inbox.png "Inbox view")
+
+![image](images/m_settings.png "Settings")
+
 #### Screen Navigation:
 
 ![image](images/m_navigation.png "Screen navigation")
