@@ -10,8 +10,8 @@ Harbour Chat App Design Document
 #### Approaches Considered:
 * REACT vs. Flutter for frontend
   * One of our main concerns was what would be the easiest way to bring our application to multiple platforms, while still maintaining a low level of customization. We landed between REACT (which includes react router) and Flutter, both of which are excellent at building applications for multiple platforms. Ultimately we landed on Flutter, due to it's bundle size, performance, and the fact that everything is written in Dart as opposed to the multiple languages it would take to get REACT even just running. 
-* Python vs. GoLang for backend
-  * 
+* Python vs. Go for backend
+  * While the majority of team members have experience in python, it was ultimately we decided it would be a better option to implement the backend in Go, rather than a python web framework such as Django. First and foremost, many team members expressed interest in picking up the Go language, and since most team members will touch the backend at some point it will be a good learning experience and practice. In addition, we believe Go provides a functional advantage over python in how it handles concurrency, which while a bit "overboard" for an application of this scale, allows team members to implement a functionbly reliable and scalable option.
 #### Mockups:
 
 ![image](images/m_login.png "Login screen")
@@ -260,7 +260,13 @@ Harbour Chat App Design Document
 #### User Authentication / Data Security Considerations:
 * Passwords must be hashed and never stored as plaintext
 * User Authentication will require email verification
-* 
+* Login API's from other websites such as Google may also be used for user authentication
+* Spam protection to avoid client/server interrupts
+* Warn users being redirected by links
+* Private messages may be end-to-end encrypted
+* Servers may select security options, such as:
+  * Invitation may or may not be required
+  * Ability for admins to manage/remove users or messages
 #### Tech stack:
 * __Platform__
   * WebApp, Mobile app, Desktop app
