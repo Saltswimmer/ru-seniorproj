@@ -264,12 +264,12 @@ Harbour Chat App Design Document
   * New users can hit the "sign up" link to go to the registration screen
   * If the user has 2FA set up, they will be given a 2FA prompt
   * Used API endpoints:
-   * /api/users/login
-   * /api/users/twofactor
+    * /api/users/login
+    * /api/users/twofactor
 * __Sign up__
   * Users sign up by entering an email, username, and password
   * Used API endpoints:
-   * /api/users/registration
+    * /api/users/registration
 * __First time user__
   * Appears after a user registers and verifies their email
   * Just gives the user some pointers on how to get started
@@ -279,12 +279,12 @@ Harbour Chat App Design Document
   * One side panel shows the members of the current server
   * The other displays the channels as well as the other servers that the user can connect to
   * Used API endpoints:
-   * /api/servers/serverinfoinside
-   * /api/servers/editserver
-   * /api/servers/channel/chat
-   * /api/servers/channel/chatget
-   * /api/servers/merge
-   * /api/servers/endmerge
+    * /api/servers/serverinfoinside
+    * /api/servers/editserver
+    * /api/servers/channel/chat
+    * /api/servers/channel/chatget
+    * /api/servers/merge
+    * /api/servers/endmerge
 * __Browse view__
   * Allows the user to search for people and other servers
   * Individual users can make friend requests or request to be invited onboard a server
