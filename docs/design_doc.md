@@ -258,6 +258,43 @@ Harbour Chat App Design Document
 ```
 
 ### Functionality provided by each screen:
+* __Login__
+  * Users can sign into their account by entering their email and password
+  * If a user forgets their password, they can request a password reset
+  * New users can hit the "sign up" link to go to the registration screen
+  * If the user has 2FA set up, they will be given a 2FA prompt
+  * Used API endpoints:
+   * /api/users/login
+   * /api/users/twofactor
+* __Sign up__
+  * Users sign up by entering an email, username, and password
+  * Used API endpoints:
+   * /api/users/registration
+* __First time user__
+  * Appears after a user registers and verifies their email
+  * Just gives the user some pointers on how to get started
+* __Main view__
+  * This is where the user will spend most of their time
+  * In the middle, the main view shows the current server and channel
+  * One side panel shows the members of the current server
+  * The other displays the channels as well as the other servers that the user can connect to
+  * Used API endpoints:
+   * /api/servers/serverinfoinside
+   * /api/servers/editserver
+   * /api/servers/channel/chat
+   * /api/servers/channel/chatget
+   * /api/servers/merge
+   * /api/servers/endmerge
+* __Browse view__
+  * Allows the user to search for people and other servers
+  * Individual users can make friend requests or request to be invited onboard a server
+* __Inbox view__
+  * Displays all of the user's direct message conversations
+  * The user can also view their notifications from this screen
+   * The notifications are treated like a read-only DM conversation
+  * DMs will probably be implemented in a very similar way to how servers are implemented
+* __Settings view__
+  * Allows the user to adjust settings
 
 ### User Authentication / Data Security Considerations:
 * Passwords must be hashed and never stored as plaintext
