@@ -35,7 +35,7 @@ Harbour Chat App Design Document
 ![image](images/m_navigation.png "Screen navigation")
 
 ### Backend Information:
-![image](images/ProjectSchemaDraft.png "Draft of database schema")
+![image](images/HarbourAppSchema-2023-02-24_08-25.png "Draft of database schema")
 
 ### API Endpoints:
 #### User Information
