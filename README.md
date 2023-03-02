@@ -41,7 +41,7 @@ make db.update - will automatically perform DB migrations using Atlas
 4. Add a new server
     i. Give a name
     ii. On connection tab enter:
-        a. host: harbour_app
+        a. host: harbour_db
         b. user: test
         c. password: test
         d. database: test
