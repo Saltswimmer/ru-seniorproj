@@ -1,12 +1,6 @@
+export PATH := $(PATH):/usr/local/go/bin
+
 # Pulled from https://gist.github.com/thomaspoignant/5b72d579bd5f311904d973652180c705
-GOCMD=go
-GOTEST=$(GOCMD) test
-GOVET=$(GOCMD) vet
-BINARY_NAME=gomin
-VERSION?=0.0.0
-SERVICE_PORT?=3000
-DOCKER_REGISTRY?= #if set it should finished by /
-EXPORT_RESULT?=false # for CI please set EXPORT_RESULT to true
 
 GREEN  := $(shell tput -Txterm setaf 2)
 YELLOW := $(shell tput -Txterm setaf 3)
@@ -14,9 +8,14 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
-.PHONY: all test build vendor
+.PHONY: all test build run
 
 all: help
+
+## Build:
+build: ## Build the server
+	mkdir -p out/bin
+	go build -mod vendor -o out/bin/harbour-api cmd/main.go
 
 ## Database:
 db.update: ## Update database
@@ -27,6 +26,10 @@ d.up: ## Start docker compose
 	docker-compose up -d 
 d.down: ## Stop docker container
 	docker-compose down
+
+## api:
+run: build db.update ## Starts database and builds and runs the server
+	./out/bin/harbour-api
 
 ## Help:
 help: ## Show this help.
