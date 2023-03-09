@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"net/http"
 	"time"
+	"encoding/json"
 )
 
 var sampleSecretKey = []byte("secret")
@@ -20,13 +21,12 @@ const (
 	dbname   = "test"
 )
 
-type addUserReq struct {
-	first_name  string `json:"first_name"`
-	middle_name string `json:"middle_name"`
-	last_name   string `json:"last_name"`
-	username    string `json:"username"`
-	email       string `json:"email"`
-}
+type AddUserReq struct {
+	First_name  string `json:"first_name"`
+	Middle_name string `json:"middle_name"`
+	Last_name   string `json:"last_name"`
+	Username    string `json:"username"`
+	Email       string `json:"email"`}
 
 func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -61,15 +61,15 @@ func main() {
 }
 
 func addUser(c echo.Context, db *sql.DB) (string, error) {
-	var req addUserReq
-	err := c.Bind(&req)
-	if err != nil {
+	var req AddUserReq
+	err := json.NewDecoder(c.Request().Body).Decode(&req); if err != nil {
 		return "", err
 	}
 
 	sql := `INSERT INTO users (first_name, middle_name, last_name, username, email, date_created) VALUES ($1, $2, $3, $4, $5, $6)`
-	date := time.Now().Format("2023-03-09")
-	_, err = db.Exec(sql, req.first_name, req.middle_name, req.last_name, req.username, req.email, date)
+	date := time.Now().Format("2006-01-02")
+	fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
+	_, err = db.Exec(sql, req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
 	if err != nil {
 		return "", err
 	}
@@ -79,7 +79,7 @@ func addUser(c echo.Context, db *sql.DB) (string, error) {
 	//expire in ten minutes
 	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
 	claims["authorized"] = true
-	claims["user"] = req.username
+	claims["user"] = req.Username
 
 	tokenString, err := token.SignedString(sampleSecretKey)
 	if err != nil {
