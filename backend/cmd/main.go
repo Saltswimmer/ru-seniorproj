@@ -10,10 +10,10 @@ import (
 
 type CustomContext struct {
 	echo.Context
-	Id int `json:"id"`
-    Name string `json:"name"`
-    Price int `json:"price"`
-    Description string `json:"description"`
+	UserId int `json:"id"`
+    First_Name string `json:"first_name"`
+	Last_Name string `json:"last_name"`
+	User_Name string `json:"user_name"`
 }
 
 func (c *CustomContext) Foo() {
@@ -33,7 +33,7 @@ func main() {
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &CustomContext{c, 1, "Eric", 50, "Hello"}
+			cc := &CustomContext{c, 1, "Eric", "Heitmann", "H3its"}
 			return next(cc)
 		}
 	})
@@ -42,7 +42,7 @@ func main() {
 		cc := c.(*CustomContext)
 		cc.Foo()
 		cc.Bar()
-		return cc.String(http.StatusOK, cc.Name)
+		return cc.JSON(http.StatusOK, cc)
 	})
 
 
