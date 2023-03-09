@@ -5,7 +5,7 @@ table "users" {
         type = text
     }
     column "first_name" {
-        null = true
+        null = false
         type = text
     }
     column "middle_name" {
@@ -13,15 +13,15 @@ table "users" {
         type = text
     }
      column "last_name" {
-        null = true
+        null = false
         type = text
     }
     column "username" {
-        null = true
+        null = false
         type = text
     }
     column "email" {
-        null = true
+        null = false
         type = text
     }
     column "date_created" {
