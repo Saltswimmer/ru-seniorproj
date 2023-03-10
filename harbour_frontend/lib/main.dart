@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
+import 'package:flutter_frontend/user_service.dart';
+import 'package:flutter_frontend/user_model.dart';
 
 void main() {
   runApp(MaterialApp(
