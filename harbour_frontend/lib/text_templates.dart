@@ -18,8 +18,8 @@ abstract class TextTemplates {
                 fontWeight: FontWeight.bold, fontSize: 28.0, color: color)));
   }
 
-  static RichText medium(String text) {
+  static RichText medium(String text, Color color) {
     return RichText(
-        text: TextSpan(text: text, style: const TextStyle(fontSize: 14.0)));
+        text: TextSpan(text: text, style: TextStyle(fontSize: 14.0, color: color)));
   }
 }

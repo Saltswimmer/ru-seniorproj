@@ -2,15 +2,15 @@
 
 A new Flutter project.
 
-## Getting Started
+## Getting Started with development
 
-This project is a starting point for a Flutter application.
+Using VScode for your IDE is highly recommended.
 
-A few resources to get you started if this is your first Flutter project:
+If you're using VScode, you should download the following extensions:
+- Dart (extension id is Dart-Code.dart-code)
+- Flutter (extension id is Dart-Code.flutter)
+- Awesome Flutter Snippets (extension id is Nash.awesome-flutter-snippets)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+To run the application, open a new terminal and type "flutter run".
+If you make changes to source code, you can type "r" into the terminal to do a hot reload.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

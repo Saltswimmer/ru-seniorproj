@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
-import 'package:harbour_frontend/user_service.dart';
-import 'package:harbour_frontend/user_model.dart';
+import 'package:harbour_frontend/api/user_service.dart';
+import 'package:harbour_frontend/models/user_model.dart';
 
 void main() {
   runApp(MaterialApp.router(
