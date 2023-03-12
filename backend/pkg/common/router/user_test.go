@@ -14,9 +14,11 @@ import (
 )
 
 var testEcho *echo.Echo
+var testHandler *Handler
 
 func init() {
 	testEcho = echo.New()
+	testHandler, _ = LoadHandler()
 }
 
 func makeRequest(method, url string, body interface{}) (*http.Request, *httptest.ResponseRecorder) {
@@ -30,10 +32,10 @@ func makeRequest(method, url string, body interface{}) (*http.Request, *httptest
 
 func TestSignup(t *testing.T) {
 
-	u := signupReq{first_name: "Jim", middle_name: "Bob", last_name: "Cooter", username: "jimbob", email: "jimbob@foo.bar"}
+	u := signupReq{First_name: "Jim", Middle_name: "Bob", Last_name: "Cooter", Username: "jimbob", Email: "jimbob@foo.bar"}
 	req, rec := makeRequest(http.MethodPost, "/signup", u)
 	c := testEcho.NewContext(req, rec)
-	if assert.NoError(t, SignUp(c)) {
+	if assert.NoError(t, testHandler.SignUp(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 	b, err := io.ReadAll(rec.Body)
