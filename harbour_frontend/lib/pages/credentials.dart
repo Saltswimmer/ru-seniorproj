@@ -1,12 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:harbour_frontend/models/token.dart';
+import 'package:dio/dio.dart';
 
 class CredentialsPageMixin {
   Widget build(BuildContext context) {
@@ -151,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
             TextFormField(
               autocorrect: false,
               enableSuggestions: false,
-              controller: _email,
+              controller: _username,
               decoration: InputDecoration(
                 hintText: 'What should other people call you?',
               ),
@@ -190,24 +189,37 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
 
             // REGISTER BUTTON
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.primary),
-              onPressed: () async {
-                final email = _email.text;
-                final username = _username.text;
-                final password = _password.text;
-                final confirmPassword = _confirmPassword.text;
+                style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary),
+                onPressed: () async {
+                  final email = _email.text;
+                  final username = _username.text;
+                  final password = _password.text;
+                  final confirmPassword = _confirmPassword.text;
 
-                if (_formKey.currentState!.validate()) {
-                  Token token = await UserService().addUser({
-                    'first_name': '',
-                    'middle_name': '',
-                    'last_name': '',
-                    'email': email,
-                    'username': username,
-                  });
-                }
-              },
-              child: TextTemplates.medium('Register', Theme.of(context).colorScheme.onPrimary)),
+                  if (_formKey.currentState!.validate()) {
+                    Token token = await UserService().addUser({
+                      'first_name': '',
+                      'middle_name': '',
+                      'last_name': '',
+                      'email': email,
+                      'username': username,
+                    });
+                  }
+                },
+                child: TextTemplates.medium(
+                    'Register', Theme.of(context).colorScheme.onPrimary)),
+
+            // TEST BUTTON (REMOVE ME LATER)
+            TextButton(
+                style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.primary),
+                onPressed: () async {
+                  final res = await Dio().get("https://en.wikipedia.org/");
+                  print(res);
+                },
+                child: TextTemplates.medium(
+                    'Test', Theme.of(context).colorScheme.onPrimary)),
           ] // Children
               ))
     ];
