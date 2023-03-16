@@ -8,11 +8,11 @@ import (
 	_ "github.com/lib/pq"
 	"net/http"
 	"time"
-	"encoding/json"
 )
 
 var sampleSecretKey = []byte("secret")
 
+//db login info
 const (
 	host     = "host.docker.internal"
 	port     = 5435
@@ -21,14 +21,17 @@ const (
 	dbname   = "test"
 )
 
+//struct for addUser endpoint
 type AddUserReq struct {
 	First_name  string `json:"first_name"`
 	Middle_name string `json:"middle_name"`
 	Last_name   string `json:"last_name"`
 	Username    string `json:"username"`
-	Email       string `json:"email"`}
+	Email       string `json:"email"`
+}
 
 func main() {
+	//setup database connection
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -38,29 +41,17 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
-
+	
+	//this ping is necessary to establish the connection
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
-
+	
+	
 	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
-
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			cc := &CustomContext{c, 1, "Eric", "Heitmann", "H3its"}
-			return next(cc)
-		}
-	})
-
 	e.GET("/", func(c echo.Context) error {
-		cc := c.(*CustomContext)
-		cc.Foo()
-		cc.Bar()
-		return cc.JSON(http.StatusOK, cc)
+		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.POST("/addUser", func(c echo.Context) error {
 		token, err := addUser(c, db)
@@ -75,19 +66,22 @@ func main() {
 }
 
 func addUser(c echo.Context, db *sql.DB) (string, error) {
+	//
 	var req AddUserReq
-	err := json.NewDecoder(c.Request().Body).Decode(&req); if err != nil {
+	err := c.Bind(&req); if err != nil {
 		return "", err
 	}
 
+	//define the sql statement to use for this endpoint
 	sql := `INSERT INTO users (first_name, middle_name, last_name, username, email, date_created) VALUES ($1, $2, $3, $4, $5, $6)`
 	date := time.Now().Format("2006-01-02")
-	fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
+	//fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
 	_, err = db.Exec(sql, req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
 	if err != nil {
 		return "", err
 	}
-
+	
+	//make a token
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	//expire in ten minutes

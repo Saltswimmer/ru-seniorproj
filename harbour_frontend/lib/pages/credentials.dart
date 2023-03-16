@@ -215,7 +215,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                 style: TextButton.styleFrom(
                     foregroundColor: Theme.of(context).colorScheme.primary),
                 onPressed: () async {
-                  final res = await Dio().get("https://en.wikipedia.org/");
+                  final res = await Dio().get("http://localhost:1323");
                   print(res);
                 },
                 child: TextTemplates.medium(
