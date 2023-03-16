@@ -2,11 +2,7 @@ table "users" {
     schema = schema.public
     column "user_id" {
         null = false
-<<<<<<< HEAD
         type = serial
-=======
-        type = text
->>>>>>> origin/testbackend
     }
     column "first_name" {
         null = false
