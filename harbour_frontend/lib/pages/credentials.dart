@@ -1,28 +1,76 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
-import 'package:harbour_frontend/models/token.dart';
-import 'package:dio/dio.dart';
+import 'package:localstorage/localstorage.dart';
+import 'package:go_router/go_router.dart';
+import 'package:harbour_frontend/routes.dart';
 
 class CredentialsPageMixin {
+  late final ColorScheme colors;
+
+  late final TextField base;
+
+  Widget makeTextField(
+          {required TextEditingController controller,
+          String? Function(String?)? validator, // this type is amazing
+          String? hint,
+          bool obscureText = false,
+          bool isEmail = false}) =>
+      Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: TextField(
+          autocorrect: false,
+          cursorColor: colors.surface,
+          enableSuggestions: false,
+          obscureText: obscureText,
+          keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+          decoration: InputDecoration(
+            hintText: hint,
+            labelStyle: TextStyle(
+              color: colors.surface,
+            ),
+            border: UnderlineInputBorder(borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(6.0), topRight: Radius.circular(4.0)
+            ))
+          ),
+          controller: controller,
+        ),
+      );
+
   Widget build(BuildContext context) {
+    colors = Theme.of(context).colorScheme;
+
+    base = TextField(
+      autocorrect: false,
+      cursorColor: colors.secondary,
+      enableSuggestions: false,
+    );
+
     return Scaffold(
-        body: Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: Alignment.topCenter,
-      child: FittedBox(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 500.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: body(context),
+      backgroundColor: colors.background,
+      body: Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.topCenter,
+        child: FittedBox(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500),
+            child: Container(
+              child: ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(Icons.flag_sharp, size: 42, color: colors.onBackground),
+                    TextTemplates.headline("Harbour", colors.onBackground),
+                  ])
+                ].followedBy(body(context)).toList(),
+              ),
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   List<Widget> body(BuildContext context) {
@@ -38,6 +86,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
+  final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _email;
   late final TextEditingController _password;
 
@@ -55,41 +105,73 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
     super.dispose();
   }
 
+  Future<void> landingRedirect() async {
+    try {
+      final ls = LocalStorage('harbour.json');
+
+      String jwt = ls.getItem('auth_token');
+
+      // Check with server to see if token is expired
+
+      // If user already has an active session skip the login screen
+
+      // Routes.router.pushReplacement(...)
+    } catch (e) {}
+  }
+
   @override
   List<Widget> body(BuildContext context) {
+    landingRedirect();
     return [
-      TextTemplates.headline('Log in', Theme.of(context).colorScheme.onPrimary),
+      Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // EMAIL
+                makeTextField(
+                    controller: _email,
+                    hint: 'Enter your email address',
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter an email address';
+                      }
+                    },
+                    isEmail: true),
 
-      // EMAIL
-      TextField(
-        autocorrect: false,
-        enableSuggestions: false,
-        controller: _email,
-        decoration: InputDecoration(
-          hintText: 'Enter your email address',
-        ),
-      ),
+                // PASSWORD
+                makeTextField(
+                  controller: _password,
+                  hint: 'Enter your password',
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Please enter a password';
+                    }
+                  },
+                  obscureText: true,
+                ),
 
-      // PASSWORD
-      TextField(
-        autocorrect: false,
-        enableSuggestions: false,
-        obscureText: true,
-        controller: _password,
-        decoration: InputDecoration(
-          hintText: 'Enter your password',
-        ),
-      ),
+                // LOGIN BUTTON
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        final email = _email.text;
+                        final password = _password.text;
 
-      // LOGIN BUTTON
-      TextButton(
-          onPressed: () async {
-            final email = _email.text;
-            final password = _password.text;
-
-            // Do some auth stuff here
-          },
-          child: const Text('Log in')),
+                        // Do some auth stuff here
+                      },
+                      child: TextTemplates.large('Log in', colors.onSurface)),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: colors.onBackground),
+                  onPressed: () => Routes.router.push('/register'),
+                  child: TextTemplates.medium("Don't have an account? Sign up!", colors.onBackground),
+                ),
+              ],
+            ),
+          )),
     ];
   }
 }
@@ -130,88 +212,93 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
   @override
   List<Widget> body(BuildContext context) {
     return [
-      TextTemplates.headline(
-          'Sign up', Theme.of(context).colorScheme.onPrimary),
       Form(
-          key: _formKey,
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(children: [
             // EMAIL
-            TextFormField(
-              autocorrect: false,
-              enableSuggestions: false,
-              keyboardType: TextInputType.emailAddress,
+            makeTextField(
               controller: _email,
-              decoration: InputDecoration(
-                hintText: 'Enter your email address',
-              ),
+              hint: 'Enter your email address',
+              isEmail: true,
             ),
-
+        
             // USERNAME
-            TextFormField(
-              autocorrect: false,
-              enableSuggestions: false,
+            makeTextField(
               controller: _username,
-              decoration: InputDecoration(
-                hintText: 'What should other people call you?',
-              ),
+              hint: 'What should other people call you?',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a username';
+                } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
+                  return 'Only Latin alphabet letters and underscores are allowed in usernames';
+                }
+              },
             ),
-
+        
             // PASSWORD
-            TextFormField(
-                autocorrect: false,
-                enableSuggestions: false,
-                obscureText: true,
-                controller: _password,
-                decoration: InputDecoration(
-                  hintText: 'Enter a strong password',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                }),
-
-            // CONFIRM PASSWORD
-            TextFormField(
-              autocorrect: false,
-              enableSuggestions: false,
+            makeTextField(
+              controller: _password,
+              hint: 'Enter a strong password',
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter a password';
+                }
+              },
               obscureText: true,
+            ),
+        
+            // CONFIRM PASSWORD
+            makeTextField(
               controller: _confirmPassword,
-              decoration: InputDecoration(
-                hintText: 'Confirm your password',
-              ),
+              hint: 'Confirm your password',
               validator: (value) {
                 if (value != _password.text) {
                   return 'Both passwords must match';
                 }
               },
+              obscureText: true,
             ),
-
+        
             // REGISTER BUTTON
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                  onPressed: () async {
+                    final email = _email.text;
+                    final username = _username.text;
+                    final password = _password.text;
+                    final confirmPassword = _confirmPassword.text;
+            
+                    if (_formKey.currentState!.validate()) {
+                      String? jwt = await UserService().addUser({
+                        'first_name': '',
+                        'middle_name': '',
+                        'last_name': '',
+                        'email': email,
+                        'username': username,
+                      });
+            
+                      if (jwt == null) {
+                        // put up some kinda error
+                      } else {
+                        // Store token in local storage
+                        final ls = LocalStorage('harbour.json');
+                        ls.setItem('auth_token', jwt);
+                      }
+                    }
+                  },
+                  child: TextTemplates.large('Register', colors.onSurface)),
+            ),
             TextButton(
-                style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary),
-                onPressed: () async {
-                  final email = _email.text;
-                  final username = _username.text;
-                  final password = _password.text;
-                  final confirmPassword = _confirmPassword.text;
-
-                  if (_formKey.currentState!.validate()) {
-                    String jwt = await UserService().addUser({
-                      'first_name': '',
-                      'middle_name': '',
-                      'last_name': '',
-                      'email': email,
-                      'username': username,
-                    });
-                    print(jwt);
-                  }
-                },
-                child: TextTemplates.medium(
-                    'Register', Theme.of(context).colorScheme.onPrimary)),
-          ] // Children
-              ))
+              style: TextButton.styleFrom(foregroundColor: colors.onBackground),
+              onPressed: () => Routes.router.push('/login'),
+              child: TextTemplates.medium("Already have an account? Sign in.", colors.onBackground),
+            ),
+          ]),
+        ),
+      ),
     ];
   }
 }

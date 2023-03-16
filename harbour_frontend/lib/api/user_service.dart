@@ -25,8 +25,8 @@ class UserService {
     return users;
   }
 
-  Future<String> addUser(Map user) async {
-    late String jwt;
+  Future<String?> addUser(Map user) async {
+    String? jwt;
 
     try {
       final res = await dio.post('http://localhost:1323/addUser', data: user);
@@ -34,7 +34,6 @@ class UserService {
       jwt = res.data.toString();
     } on DioError catch (e) {
       print(e.message);
-      jwt = "Error!";
     }
     return jwt;
   }

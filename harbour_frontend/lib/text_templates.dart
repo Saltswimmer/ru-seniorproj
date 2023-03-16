@@ -18,6 +18,11 @@ abstract class TextTemplates {
                 fontWeight: FontWeight.bold, fontSize: 28.0, color: color)));
   }
 
+  static RichText large(String text, Color color) {
+    return RichText(
+        text: TextSpan(text: text, style: TextStyle(fontSize: 18.0, color: color)));
+  }
+
   static RichText medium(String text, Color color) {
     return RichText(
         text: TextSpan(text: text, style: TextStyle(fontSize: 14.0, color: color)));

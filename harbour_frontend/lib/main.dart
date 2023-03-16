@@ -16,15 +16,47 @@ void main() {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        colorScheme: scheme),
+      colorScheme: scheme,
+      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        surfaceTintColor: Colors.white,
+        
+      )),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: scheme.shadow,
+        hoverColor: Colors.white,
+        hintStyle: TextStyle(
+          color: scheme.tertiary,
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            width: 4.0,
+            color: scheme.tertiary
+          )
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            width: 4.0,
+            color: scheme.surface
+          )
+        )
+      ),
+    ),
     routerConfig: Routes.router,
   ));
 }
 
 const ColorScheme scheme = ColorScheme.highContrastDark(
     background: Color(0xff1f2f3f),
-      onBackground: Color(0xfff0f0f0),
+    onBackground: Color(0xfff0f0f0),
     primary: Color(0xff445566),
-      onPrimary: Colors.white,
+    onPrimary: Colors.white,
     secondary: Color(0xffff7f5f),
-      onSecondary: Colors.black);
+    onSecondary: Colors.black,
+    tertiary: Colors.white38,
+    shadow: Colors.black45,
+    surface: Color(0xff77ccff),
+    onSurface: Color(0xff1f2f3f),
+    );
