@@ -25,19 +25,17 @@ class UserService {
     return users;
   }
 
-  Future<Token> addUser(Map user) async {
-    late Token token;
+  Future<String> addUser(Map user) async {
+    late String jwt;
 
     try {
-      final res =
-          await dio.put('http://localhost:5000/addUser', data: user);
+      final res = await dio.post('http://localhost:1323/addUser', data: user);
 
-      token = Token.fromBase64(res.data['addUser']);
+      jwt = res.data.toString();
     } on DioError catch (e) {
       print(e.message);
-      token = const Token(header: {}, payload: {}, signature: {});
+      jwt = "Error!";
     }
-
-    return token;
+    return jwt;
   }
 }

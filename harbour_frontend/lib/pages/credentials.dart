@@ -198,28 +198,18 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                   final confirmPassword = _confirmPassword.text;
 
                   if (_formKey.currentState!.validate()) {
-                    Token token = await UserService().addUser({
+                    String jwt = await UserService().addUser({
                       'first_name': '',
                       'middle_name': '',
                       'last_name': '',
                       'email': email,
                       'username': username,
                     });
+                    print(jwt);
                   }
                 },
                 child: TextTemplates.medium(
                     'Register', Theme.of(context).colorScheme.onPrimary)),
-
-            // TEST BUTTON (REMOVE ME LATER)
-            TextButton(
-                style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(context).colorScheme.primary),
-                onPressed: () async {
-                  final res = await Dio().get("http://localhost:1323");
-                  print(res);
-                },
-                child: TextTemplates.medium(
-                    'Test', Theme.of(context).colorScheme.onPrimary)),
           ] // Children
               ))
     ];
