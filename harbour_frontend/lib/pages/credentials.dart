@@ -272,7 +272,6 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     final email = _email.text;
                     final username = _username.text;
                     final password = _password.text;
-                    final confirmPassword = _confirmPassword.text;
 
                     if (_formKey.currentState!.validate()) {
                       Token jwt = await UserService().signup({
@@ -281,6 +280,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                         'last_name': '',
                         'email': email,
                         'username': username,
+                        'password': password,
                       });
 
                       try {

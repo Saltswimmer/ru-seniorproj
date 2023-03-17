@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
 
 var sampleSecretKey = []byte("secret")
@@ -21,6 +22,7 @@ type signupReq struct {
 	LastName   string `json:"last_name"`
 	UserName   string `json:"username"`
 	Email      string `json:"email"`
+	Password   string `json:"password"`
 }
 
 type authResponse struct {
@@ -45,12 +47,18 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return err
 	}
 
+	// Hash the password using bcrypt algorithm
+	hash, err := util.Hash(req.Password)
+	if err != nil {
+		return err
+	}
+
 	//define the sql statement to use for this endpoint
-	sql := `INSERT INTO users (first_name, middle_name, last_name, username, email, date_created, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	sql := `INSERT INTO users (first_name, middle_name, last_name, username, email, pass_hash, date_created, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	date := time.Now()
-	//fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
+	//fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, hash, date)
 	id := uuid.New()
-	_, err = h.db.Exec(sql, req.FirstName, req.MiddleName, req.LastName, req.UserName, req.Email, date, id.String())
+	_, err = h.db.Exec(sql, req.FirstName, req.MiddleName, req.LastName, req.UserName, req.Email, hash, date, id.String())
 	if err != nil {
 		return err
 	}
