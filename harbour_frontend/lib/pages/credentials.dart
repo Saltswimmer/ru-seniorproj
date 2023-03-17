@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:localstorage/localstorage.dart';
@@ -272,21 +273,14 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     final confirmPassword = _confirmPassword.text;
             
                     if (_formKey.currentState!.validate()) {
-                      String? jwt = await UserService().addUser({
+                      Token jwt = await UserService().signup({
                         'first_name': '',
                         'middle_name': '',
                         'last_name': '',
                         'email': email,
                         'username': username,
                       });
-            
-                      if (jwt == null) {
-                        // put up some kinda error
-                      } else {
-                        // Store token in local storage
-                        final ls = LocalStorage('harbour.json');
-                        ls.setItem('auth_token', jwt);
-                      }
+                      print(jwt.accessToken);
                     }
                   },
                   child: TextTemplates.large('Register', colors.onSurface)),

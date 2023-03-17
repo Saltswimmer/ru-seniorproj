@@ -1,25 +1,15 @@
-import 'dart:convert';
-
 class Token {
-  final Map header;
-  final Map payload;
-  final Map signature;
+  final String? accessToken;
+  final String? tokenType;
 
-  const Token(
-      {required this.header, required this.payload, required this.signature});
+  const Token({required this.accessToken, required this.tokenType});
 
-  factory Token.fromBase64(String jwt) {
-    List<Map> decodedToken = [];
-    jwt.split(".").forEach((element) => decodedToken.add(
-        json.decode(utf8.decode(base64.decode(base64.normalize(element))))));
-
+  factory Token.fromJSON(Map<String, dynamic> json) {
     try {
       return Token(
-          header: decodedToken[0],
-          payload: decodedToken[1],
-          signature: decodedToken[2]);
+          accessToken: json['access_token'].toString(), tokenType: json['token_type'].toString());
     } catch (e) {
-      return const Token(header: {}, payload: {}, signature: {});
+      return const Token(accessToken: null, tokenType: null);
     }
   }
 }

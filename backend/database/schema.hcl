@@ -2,7 +2,7 @@ table "users" {
     schema = schema.public
     column "user_id" {
         null = false
-        type = serial
+        type = text
     }
     column "first_name" {
         null = false
