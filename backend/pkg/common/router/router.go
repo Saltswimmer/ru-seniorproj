@@ -7,17 +7,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// class UserHandler {
-// 	private Database db;
-
-// 	public UserHandler(Database db) {
-// 		this.db = db;
-// 	}
-// 	public void saveUser(User user) {
-// 		db.insert(...user...)
-// 	}
-// }
-
 type Handler struct {
 	db *sql.DB
 }

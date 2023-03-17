@@ -1,15 +1,18 @@
 package main
 
 import (
-	"net/http"
-	
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/router"
 	"github.com/labstack/echo/v4"
 )
 
 func main() {
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	handler, err := router.LoadHandler()
+	if err != nil {
+		panic(err)
+	}
+
+	e.POST("/signup", handler.SignUp)
+	e.GET("/users/:id", handler.GetUser)
 	e.Logger.Fatal(e.Start(":1323"))
 }
