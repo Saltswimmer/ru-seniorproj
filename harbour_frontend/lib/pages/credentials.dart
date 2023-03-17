@@ -5,13 +5,12 @@ import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/routes.dart';
 
 class CredentialsPageMixin {
-  late final ColorScheme colors;
+  late ColorScheme colors;
 
-  late final TextField base;
+  late TextField base;
 
   Widget makeTextField(
           {required TextEditingController controller,
@@ -26,16 +25,17 @@ class CredentialsPageMixin {
           cursorColor: colors.surface,
           enableSuggestions: false,
           obscureText: obscureText,
-          keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+          keyboardType:
+              isEmail ? TextInputType.emailAddress : TextInputType.text,
           decoration: InputDecoration(
-            hintText: hint,
-            labelStyle: TextStyle(
-              color: colors.surface,
-            ),
-            border: UnderlineInputBorder(borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(6.0), topRight: Radius.circular(4.0)
-            ))
-          ),
+              hintText: hint,
+              labelStyle: TextStyle(
+                color: colors.surface,
+              ),
+              border: UnderlineInputBorder(
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(6.0),
+                      topRight: Radius.circular(4.0)))),
           controller: controller,
         ),
       );
@@ -61,7 +61,8 @@ class CredentialsPageMixin {
                 shrinkWrap: true,
                 children: <Widget>[
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Icon(Icons.flag_sharp, size: 42, color: colors.onBackground),
+                    Icon(Icons.flag_sharp,
+                        size: 42, color: colors.onBackground),
                     TextTemplates.headline("Harbour", colors.onBackground),
                   ])
                 ].followedBy(body(context)).toList(),
@@ -109,7 +110,7 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
     try {
       final ls = LocalStorage('harbour.json');
 
-      String jwt = ls.getItem('auth_token');
+      String jwt = ls.getItem('access_token');
 
       // Check with server to see if token is expired
 
@@ -165,9 +166,11 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
                       child: TextTemplates.large('Log in', colors.onSurface)),
                 ),
                 TextButton(
-                  style: TextButton.styleFrom(foregroundColor: colors.onBackground),
+                  style: TextButton.styleFrom(
+                      foregroundColor: colors.onBackground),
                   onPressed: () => Routes.router.push('/register'),
-                  child: TextTemplates.medium("Don't have an account? Sign up!", colors.onBackground),
+                  child: TextTemplates.medium(
+                      "Don't have an account? Sign up!", colors.onBackground),
                 ),
               ],
             ),
@@ -223,7 +226,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
               hint: 'Enter your email address',
               isEmail: true,
             ),
-        
+
             // USERNAME
             makeTextField(
               controller: _username,
@@ -236,7 +239,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                 }
               },
             ),
-        
+
             // PASSWORD
             makeTextField(
               controller: _password,
@@ -248,7 +251,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
               },
               obscureText: true,
             ),
-        
+
             // CONFIRM PASSWORD
             makeTextField(
               controller: _confirmPassword,
@@ -260,7 +263,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
               },
               obscureText: true,
             ),
-        
+
             // REGISTER BUTTON
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -270,7 +273,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     final username = _username.text;
                     final password = _password.text;
                     final confirmPassword = _confirmPassword.text;
-            
+
                     if (_formKey.currentState!.validate()) {
                       Token jwt = await UserService().signup({
                         'first_name': '',
@@ -279,7 +282,17 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                         'email': email,
                         'username': username,
                       });
-                      print(jwt.accessToken);
+
+                      try {
+                        final ls = LocalStorage('harbour.json');
+                        //print(jwt.accessToken);
+                        ls.setItem('access_token', jwt);
+
+                      } catch (e) {
+                        print(e.toString());
+                      }
+
+                      Routes.router.pushReplacement('/');
                     }
                   },
                   child: TextTemplates.large('Register', colors.onSurface)),
@@ -287,7 +300,8 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
             TextButton(
               style: TextButton.styleFrom(foregroundColor: colors.onBackground),
               onPressed: () => Routes.router.push('/login'),
-              child: TextTemplates.medium("Already have an account? Sign in.", colors.onBackground),
+              child: TextTemplates.medium(
+                  "Already have an account? Sign in.", colors.onBackground),
             ),
           ]),
         ),

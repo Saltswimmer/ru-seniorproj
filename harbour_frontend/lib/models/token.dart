@@ -7,9 +7,15 @@ class Token {
   factory Token.fromJSON(Map<String, dynamic> json) {
     try {
       return Token(
-          accessToken: json['access_token'].toString(), tokenType: json['token_type'].toString());
+          accessToken: json['access_token'].toString(),
+          tokenType: json['token_type'].toString());
     } catch (e) {
       return const Token(accessToken: null, tokenType: null);
     }
   }
+
+  Map toJson() => {
+    'access_token': accessToken,
+    'token_type': tokenType,
+  };
 }

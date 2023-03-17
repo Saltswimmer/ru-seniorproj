@@ -11,7 +11,7 @@ class LandingPage extends StatelessWidget {
     try {
       final ls = LocalStorage('harbour.json');
 
-      String? jwt = ls.getItem('auth_token');
+      Map? jwt = ls.getItem('access_token');
       if (jwt == null) {
         throw Error();
       }
