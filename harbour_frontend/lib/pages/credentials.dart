@@ -20,7 +20,7 @@ class CredentialsPageMixin {
           bool obscureText = false,
           bool isEmail = false}) =>
       Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(10.0),
         child: TextField(
           autocorrect: false,
           cursorColor: colors.surface,
@@ -50,7 +50,6 @@ class CredentialsPageMixin {
     );
 
     return Scaffold(
-      backgroundColor: colors.background,
       body: Container(
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.topCenter,

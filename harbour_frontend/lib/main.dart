@@ -17,6 +17,7 @@ void main() {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
       colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.background,
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
@@ -26,14 +27,14 @@ void main() {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: scheme.shadow,
-        hoverColor: Colors.white,
-        hintStyle: TextStyle(
-          color: scheme.tertiary,
+        hoverColor: Colors.white10,
+        hintStyle: const TextStyle(
+          color: Colors.white38,
         ),
-        enabledBorder: UnderlineInputBorder(
+        enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
             width: 4.0,
-            color: scheme.tertiary
+            color: Colors.white38
           )
         ),
         focusedBorder: UnderlineInputBorder(
@@ -55,7 +56,6 @@ const ColorScheme scheme = ColorScheme.highContrastDark(
     onPrimary: Colors.white,
     secondary: Color(0xffff7f5f),
     onSecondary: Colors.black,
-    tertiary: Colors.white38,
     shadow: Colors.black45,
     surface: Color(0xff77ccff),
     onSurface: Color(0xff1f2f3f),
