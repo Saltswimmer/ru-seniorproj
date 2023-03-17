@@ -31,6 +31,9 @@ d.down: ## Stop docker container
 run: build db.update ## Starts database and builds and runs the server
 	./out/bin/harbour-api
 
+test: ## running unit tests
+	go test -test.v ./...
+
 ## Help:
 help: ## Show this help.
 	@echo ''
