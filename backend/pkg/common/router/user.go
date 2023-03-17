@@ -24,8 +24,8 @@ type signupReq struct {
 }
 
 type authResponse struct {
-	AccessToken string `json:"access_token`
-	TokenType   string `json:"token_type`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
 }
 
 type User struct {
