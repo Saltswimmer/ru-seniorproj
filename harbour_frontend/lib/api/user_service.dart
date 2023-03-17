@@ -25,17 +25,13 @@ class UserService {
     return users;
   }
 
-  Future<String> addUser(Map user) async {
-    late String jwt;
-
+  Future<Token> signup(Map user) async {
     try {
-      final res = await dio.post('http://localhost:1323/addUser', data: user);
-
-      jwt = res.data.toString();
+      final res = await dio.post('http://localhost:1323/signup', data: user);
+      return Token.fromJSON(res.data);
     } on DioError catch (e) {
       print(e.message);
-      jwt = "Error!";
+      return const Token(accessToken: null, tokenType: null);
     }
-    return jwt;
   }
 }

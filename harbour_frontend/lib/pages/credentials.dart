@@ -198,14 +198,14 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                   final confirmPassword = _confirmPassword.text;
 
                   if (_formKey.currentState!.validate()) {
-                    String jwt = await UserService().addUser({
+                    Token jwt = await UserService().signup({
                       'first_name': '',
                       'middle_name': '',
                       'last_name': '',
                       'email': email,
                       'username': username,
                     });
-                    print(jwt);
+                    print(jwt.accessToken);
                   }
                 },
                 child: TextTemplates.medium(

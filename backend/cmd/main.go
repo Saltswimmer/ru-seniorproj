@@ -1,98 +1,18 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-	"github.com/golang-jwt/jwt"
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/router"
 	"github.com/labstack/echo/v4"
-	_ "github.com/lib/pq"
-	"net/http"
-	"time"
 )
-
-var sampleSecretKey = []byte("secret")
-
-//db login info
-const (
-	host     = "host.docker.internal"
-	port     = 5435
-	user     = "test"
-	password = "test"
-	dbname   = "test"
-)
-
-//struct for addUser endpoint
-type AddUserReq struct {
-	First_name  string `json:"first_name"`
-	Middle_name string `json:"middle_name"`
-	Last_name   string `json:"last_name"`
-	Username    string `json:"username"`
-	Email       string `json:"email"`
-}
 
 func main() {
-	//setup database connection
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	
-	//this ping is necessary to establish the connection
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	
-	
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
-	e.POST("/addUser", func(c echo.Context) error {
-		token, err := addUser(c, db)
-		if err == nil {
-			return c.String(http.StatusOK, token)
-		} else {
-			fmt.Println(err)
-			return c.String(http.StatusForbidden, "Error in request")
-		}
-	})
+	handler, err := router.LoadHandler()
+	if err != nil {
+		panic(err)
+	}
+
+	e.POST("/signup", handler.SignUp)
+	e.GET("/users/:id", handler.GetUser)
 	e.Logger.Fatal(e.Start(":1323"))
-}
-
-func addUser(c echo.Context, db *sql.DB) (string, error) {
-	//
-	var req AddUserReq
-	err := c.Bind(&req); if err != nil {
-		return "", err
-	}
-
-	//define the sql statement to use for this endpoint
-	sql := `INSERT INTO users (first_name, middle_name, last_name, username, email, date_created) VALUES ($1, $2, $3, $4, $5, $6)`
-	date := time.Now().Format("2006-01-02")
-	//fmt.Println(req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
-	_, err = db.Exec(sql, req.First_name, req.Middle_name, req.Last_name, req.Username, req.Email, date)
-	if err != nil {
-		return "", err
-	}
-	
-	//make a token
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	//expire in ten minutes
-	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
-	claims["authorized"] = true
-	claims["user"] = req.Username
-
-	tokenString, err := token.SignedString(sampleSecretKey)
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
 }
