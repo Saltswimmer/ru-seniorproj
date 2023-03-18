@@ -1,5 +1,4 @@
 class User {
-  final int id;
   final String first_name;
   final String middle_name;
   final String last_name;
@@ -7,7 +6,6 @@ class User {
   final String email;
 
   const User({
-    required this.id,
     required this.first_name,
     required this.middle_name,
     required this.last_name,
@@ -17,7 +15,6 @@ class User {
 
   factory User.fromJson(Map json) {
     return User(
-      id: json['id'],
       first_name: json['first_name'],
       middle_name: json['middle_name'],
       last_name: json['last_name'],
@@ -27,7 +24,6 @@ class User {
   }
 
   Map toJson() => {
-    'id': id,
     'first_name': first_name,
     'middle_name': middle_name,
     'last_name': last_name,

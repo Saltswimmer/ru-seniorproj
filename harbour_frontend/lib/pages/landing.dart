@@ -8,23 +8,11 @@ class LandingPage extends StatelessWidget {
   const LandingPage({Key? key}) : super(key: key);
 
   Future<void> landingRedirect() async {
-    try {
-      final ls = LocalStorage('harbour.json');
-
-      Map? jwt = ls.getItem('access_token');
-      if (jwt == null) {
-        throw Error();
-      }
-
-      // Check with server to see if token is expired
-
-      print('Token found!');
-    } catch (e) {
-      Routes.router.pushReplacement('/login');
+    if (LocalStorage('harbour.json').getItem('access_token') == null) {
+        Routes.router.push('/login');
+    } else {
+      Routes.router.push('/home');
     }
-
-    // Change this to last viewed server?
-    Routes.router.pushReplacement('/login');
   }
 
   @override
@@ -36,7 +24,6 @@ class LandingPage extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints.tight(Size.square(80)),
           child: CircularProgressIndicator(
-            color: Theme.of(context).colorScheme.secondary,
             strokeWidth: 6.0,
           ),
         ),

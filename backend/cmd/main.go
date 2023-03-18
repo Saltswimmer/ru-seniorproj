@@ -19,5 +19,6 @@ func main() {
 
 	e.POST("/signup", handler.SignUp)
 	e.GET("/users/:id", handler.GetUser)
+	e.GET("/user", handler.GetUserByToken)
 	e.Logger.Fatal(e.Start(":1323"))
 }

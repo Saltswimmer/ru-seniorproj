@@ -36,7 +36,11 @@ type User struct {
 	LastName   string `json:"last_name"`
 	UserName   string `json:"username"`
 	Email      string `json:"email"`
-	UserId     string `json:"user_id"`
+}
+
+type UserTokenClaims struct {
+	email string `json:"email"`
+	jwt.MapClaims
 }
 
 func (h *Handler) SignUp(c echo.Context) error {
@@ -63,12 +67,13 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return err
 	}
 
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	//expire in ten minutes
-	claims["exp"] = time.Now().Add(10 * time.Minute).Unix()
-	claims["authorized"] = true
-	claims["user"] = id.String()
+	claims := UserTokenClaims{
+		req.Email,
+		jwt.MapClaims{
+			"exp": time.Now().Add(10 * time.Minute).Unix(),
+			"authorized": true,
+			"user": id.String()}}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString(sampleSecretKey)
 	if err != nil {
@@ -85,11 +90,11 @@ func (h *Handler) GetUser(c echo.Context) error {
 	fmt.Printf("LOOKING UP USER FOR ID %s\n", id)
 
 	//define the sql statement to use for this endpoint
-	q := `SELECT first_name, middle_name, last_name, username, email, user_id FROM users WHERE user_id = $1`
+	q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
 	row := h.db.QueryRow(q, id)
 
 	var u User
-	err := row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email, &u.UserId)
+	err := row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
 	if err == nil {
 		if err == sql.ErrNoRows {
 			return c.String(http.StatusNotFound, "")
@@ -101,5 +106,54 @@ func (h *Handler) GetUser(c echo.Context) error {
 	}
 	fmt.Println("ERROR IS NOT NIL")
 	fmt.Println(err)
+	return c.String(http.StatusInternalServerError, "")
+}
+
+// Query a user using an access token instead of the id
+func (h *Handler) GetUserByToken(c echo.Context) error {
+
+	var token_param authResponse
+	err := c.Bind(&token_param)
+	if err != nil {
+		return err
+	}
+
+	token, err := jwt.ParseWithClaims(
+		token_param.AccessToken,
+		&UserTokenClaims{},
+		func(token *jwt.Token) (interface{}, error) {
+			return sampleSecretKey, nil
+		})
+
+	if claims, ok := token.Claims.(*UserTokenClaims); ok && token.Valid {
+		
+		id, err := uuid.Parse(claims.MapClaims["user"].(string))		
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		//define the sql statement to use for this endpoint
+		q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
+		row := h.db.QueryRow(q, id)
+
+		var u User
+		err = row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
+		if err == nil {
+			if err == sql.ErrNoRows {
+				return c.String(http.StatusNotFound, "")
+			}
+
+			s, _ := json.MarshalIndent(u, "", "\t")
+			fmt.Println(string(s))
+			return c.JSONPretty(http.StatusOK, u, "\t")
+		}
+		fmt.Println("ERROR IS NOT NIL")
+		fmt.Println(err)
+
+	} else {
+		fmt.Println(err)
+	}
+
 	return c.String(http.StatusInternalServerError, "")
 }

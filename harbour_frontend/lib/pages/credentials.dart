@@ -274,20 +274,24 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     final password = _password.text;
 
                     if (_formKey.currentState!.validate()) {
-                      Token jwt = await UserService().signup({
-                        'first_name': '',
-                        'middle_name': '',
-                        'last_name': '',
-                        'email': email,
-                        'username': username,
-                        'password': password,
-                      });
+                      late Token jwt;
+                      try {
+                        jwt = await UserService().signup({
+                          'first_name': '',
+                          'middle_name': '',
+                          'last_name': '',
+                          'email': email,
+                          'username': username,
+                          'password': password,
+                        });
+                      } on Exception catch (e) {
+                        print(e.toString());
+                      }
 
                       try {
                         final ls = LocalStorage('harbour.json');
                         //print(jwt.accessToken);
                         ls.setItem('access_token', jwt);
-
                       } catch (e) {
                         print(e.toString());
                       }

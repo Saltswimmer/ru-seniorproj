@@ -18,6 +18,10 @@ void main() {
         // is not restarted.
       colorScheme: scheme,
       scaffoldBackgroundColor: scheme.background,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        circularTrackColor: scheme.secondary,
+        
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
