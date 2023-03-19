@@ -43,13 +43,14 @@ func TestSignup(t *testing.T) {
 	assert.NoError(t, err)
 
 	var ar authResponse
-	json.Unmarshal(b, &ar)
+	assert.NoError(t, json.Unmarshal(b, &ar))
 
 	tokenString := ar.AccessToken
 	fmt.Println(tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return sampleSecretKey, nil
 	})
+	assert.NoError(t, err)
 
 	var userId string
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -71,7 +72,7 @@ func TestSignup(t *testing.T) {
 	b, err = io.ReadAll(rec.Body)
 	assert.NoError(t, err)
 	var user User
-	json.Unmarshal(b, &user)
+	assert.NoError(t, json.Unmarshal(b, &user))
 
 	assert.Equal(t, u.FirstName, user.FirstName)
 	assert.Equal(t, u.MiddleName, user.MiddleName)

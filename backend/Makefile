@@ -23,9 +23,15 @@ db.update: ## Update database
 
 ## Docker:
 d.up: ## Start docker compose
-	docker-compose up -d 
+	docker-compose up -d
 d.down: ## Stop docker container
 	docker-compose down
+
+## Lint:
+lint: lint-go ## Run all available linters
+
+lint-go: ## Use golintci-lint on your project
+	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:latest-alpine golangci-lint run --deadline=65s
 
 ## api:
 run: build db.update ## Starts database and builds and runs the server
