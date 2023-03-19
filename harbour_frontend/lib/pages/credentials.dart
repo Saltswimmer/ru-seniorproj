@@ -12,33 +12,21 @@ class CredentialsPageMixin {
 
   late TextField base;
 
-  Widget makeTextField(
-          {required TextEditingController controller,
-          String? Function(String?)? validator, // this type is amazing
-          String? hint,
-          bool obscureText = false,
-          bool isEmail = false}) =>
-      Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: TextField(
-          autocorrect: false,
-          cursorColor: colors.surface,
-          enableSuggestions: false,
-          obscureText: obscureText,
-          keyboardType:
-              isEmail ? TextInputType.emailAddress : TextInputType.text,
-          decoration: InputDecoration(
-              hintText: hint,
-              labelStyle: TextStyle(
-                color: colors.surface,
-              ),
-              border: UnderlineInputBorder(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(6.0),
-                      topRight: Radius.circular(4.0)))),
-          controller: controller,
-        ),
-      );
+  InputDecoration makeInputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      labelStyle: TextStyle(color: colors.surface),
+      errorStyle: TextStyle(color: colors.secondary),
+      errorBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: colors.secondary
+        )
+      ),
+      border: UnderlineInputBorder(
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(6.0),
+              topRight: Radius.circular(4.0))));
+  }
 
   Widget build(BuildContext context) {
     colors = Theme.of(context).colorScheme;
@@ -125,32 +113,48 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
     landingRedirect();
     return [
       Form(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 // EMAIL
-                makeTextField(
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: makeInputDecoration('Enter your email'),
                     controller: _email,
-                    hint: 'Enter your email address',
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'Please enter an email address';
                       }
+                      return null;
                     },
-                    isEmail: true),
+                  ),
+                ),
 
                 // PASSWORD
-                makeTextField(
-                  controller: _password,
-                  hint: 'Enter your password',
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                  },
-                  obscureText: true,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    obscureText: true,
+                    decoration: makeInputDecoration('Enter your password'),
+                    controller: _password,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
 
                 // LOGIN BUTTON
@@ -161,7 +165,25 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
                         final email = _email.text;
                         final password = _password.text;
 
-                        // Do some auth stuff here
+                        if (_formKey.currentState!.validate()) {
+                          late Token jwt;
+                          try {
+                            jwt = await UserService().signin({
+                              'email': email,
+                              'password': password,
+                            });
+                            try {
+                              final ls = LocalStorage('harbour.json');
+                              //print(jwt.accessToken);
+                              ls.setItem('access_token', jwt);
+                            } catch (e) {
+                              print(e.toString());
+                            }
+                            Routes.router.pushReplacement('/');
+                          } on Exception catch (e) {
+                            print(e.toString());
+                          }
+                        }
                       },
                       child: TextTemplates.large('Log in', colors.onSurface)),
                 ),
@@ -215,53 +237,86 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
   @override
   List<Widget> body(BuildContext context) {
     return [
-      Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(children: <Widget>[
             // EMAIL
-            makeTextField(
-              controller: _email,
-              hint: 'Enter your email address',
-              isEmail: true,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                autocorrect: false,
+                cursorColor: colors.surface,
+                enableSuggestions: false,
+                keyboardType: TextInputType.emailAddress,
+                decoration: makeInputDecoration('Enter your email'),
+                controller: _email,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter an email address';
+                  }
+                  return null;
+                },
+              ),
             ),
 
             // USERNAME
-            makeTextField(
-              controller: _username,
-              hint: 'What should other people call you?',
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a username';
-                } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
-                  return 'Only Latin alphabet letters and underscores are allowed in usernames';
-                }
-              },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                autocorrect: false,
+                cursorColor: colors.surface,
+                enableSuggestions: false,
+                decoration: makeInputDecoration('What should people call you?'),
+                controller: _username,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a username';
+                  } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
+                    return 'Only Latin alphabet letters and underscores are allowed in usernames';
+                  }
+                  return null;
+                },
+              ),
             ),
 
             // PASSWORD
-            makeTextField(
-              controller: _password,
-              hint: 'Enter a strong password',
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter a password';
-                }
-              },
-              obscureText: true,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                autocorrect: false,
+                cursorColor: colors.surface,
+                enableSuggestions: false,
+                obscureText: true,
+                decoration: makeInputDecoration('Enter your password'),
+                controller: _password,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a password';
+                  }
+                  return null;
+                },
+              ),
             ),
 
             // CONFIRM PASSWORD
-            makeTextField(
-              controller: _confirmPassword,
-              hint: 'Confirm your password',
-              validator: (value) {
-                if (value != _password.text) {
-                  return 'Both passwords must match';
-                }
-              },
-              obscureText: true,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                autocorrect: false,
+                cursorColor: colors.surface,
+                enableSuggestions: false,
+                obscureText: true,
+                decoration: makeInputDecoration('Enter your password'),
+                controller: _confirmPassword,
+                validator: (value) {
+                  if (value != _password.text) {
+                    return 'Both passwords must match';
+                  }
+                  return null;
+                },
+              ),
             ),
 
             // REGISTER BUTTON
@@ -284,19 +339,18 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                           'username': username,
                           'password': password,
                         });
+
+                        try {
+                          final ls = LocalStorage('harbour.json');
+                          //print(jwt.accessToken);
+                          ls.setItem('access_token', jwt);
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                        Routes.router.pushReplacement('/');
                       } on Exception catch (e) {
                         print(e.toString());
                       }
-
-                      try {
-                        final ls = LocalStorage('harbour.json');
-                        //print(jwt.accessToken);
-                        ls.setItem('access_token', jwt);
-                      } catch (e) {
-                        print(e.toString());
-                      }
-
-                      Routes.router.pushReplacement('/');
                     }
                   },
                   child: TextTemplates.large('Register', colors.onSurface)),

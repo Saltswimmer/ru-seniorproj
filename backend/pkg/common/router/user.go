@@ -1,5 +1,13 @@
 package router
 
+/*
+TODO
+
+- We need to ensure that email is unique even though it's not the primary key
+- Verify email
+- Change email?
+*/
+
 import (
 	"database/sql"
 	"encoding/json"
@@ -7,14 +15,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
-
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
-
-var sampleSecretKey = []byte("secret")
 
 type signupReq struct {
 	FirstName  string `json:"first_name"`
@@ -25,9 +29,9 @@ type signupReq struct {
 	Password   string `json:"password"`
 }
 
-type authResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
+type signinReq struct {
+	Email	   string `json:"email"`
+	Password   string `json:"password`
 }
 
 type User struct {
@@ -36,11 +40,6 @@ type User struct {
 	LastName   string `json:"last_name"`
 	UserName   string `json:"username"`
 	Email      string `json:"email"`
-}
-
-type UserTokenClaims struct {
-	email string `json:"email"`
-	jwt.MapClaims
 }
 
 func (h *Handler) SignUp(c echo.Context) error {
@@ -67,20 +66,42 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return err
 	}
 
-	claims := UserTokenClaims{
-		req.Email,
-		jwt.MapClaims{
-			"exp": time.Now().Add(10 * time.Minute).Unix(),
-			"authorized": true,
-			"user": id.String()}}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	tokenString, err := token.SignedString(sampleSecretKey)
+	res, err := util.GenerateUserToken(id.String(), req.Email)
 	if err != nil {
 		return err
 	}
 
-	res := authResponse{AccessToken: tokenString, TokenType: "Bearer"}
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) SignIn(c echo.Context) error {
+
+	var req signinReq
+	err := c.Bind(&req)
+	if err != nil {
+		return err
+	}
+
+	q := `SELECT user_id, pass_hash FROM users WHERE email = $1`
+	row := h.db.QueryRow(q, req.Email)
+
+	var id string
+	var hash string
+	err = row.Scan(&id, &hash)
+	if err == nil {
+		if err == sql.ErrNoRows {
+			return c.String(http.StatusNotFound, "")
+		}
+	}
+
+	if (!util.CheckHash(req.Password, hash)) {
+		return c.String(http.StatusUnauthorized, "")
+	}
+
+	res, err := util.GenerateUserToken(id, req.Email)
+	if err != nil {
+		return err
+	}
 	return c.JSON(http.StatusOK, res)
 }
 
@@ -112,48 +133,39 @@ func (h *Handler) GetUser(c echo.Context) error {
 // Query a user using an access token instead of the id
 func (h *Handler) GetUserByToken(c echo.Context) error {
 
-	var token_param authResponse
-	err := c.Bind(&token_param)
+	var token_param string
+	token_param = c.Request().Header.Get("authorization")
+
+	// Check if token is valid
+	claims, err := util.CheckToken(token_param)
 	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+		
+	id, err := uuid.Parse(claims.MapClaims["user"].(string))		
+	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
-	token, err := jwt.ParseWithClaims(
-		token_param.AccessToken,
-		&UserTokenClaims{},
-		func(token *jwt.Token) (interface{}, error) {
-			return sampleSecretKey, nil
-		})
+	//define the sql statement to use for this endpoint
+	q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
+	row := h.db.QueryRow(q, id)
 
-	if claims, ok := token.Claims.(*UserTokenClaims); ok && token.Valid {
-		
-		id, err := uuid.Parse(claims.MapClaims["user"].(string))		
-		if err != nil {
-			fmt.Println(err)
-			return err
+	var u User
+	err = row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
+	if err == nil {
+		if err == sql.ErrNoRows {
+			return c.String(http.StatusNotFound, "")
 		}
 
-		//define the sql statement to use for this endpoint
-		q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
-		row := h.db.QueryRow(q, id)
-
-		var u User
-		err = row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
-		if err == nil {
-			if err == sql.ErrNoRows {
-				return c.String(http.StatusNotFound, "")
-			}
-
-			s, _ := json.MarshalIndent(u, "", "\t")
-			fmt.Println(string(s))
-			return c.JSONPretty(http.StatusOK, u, "\t")
-		}
-		fmt.Println("ERROR IS NOT NIL")
-		fmt.Println(err)
-
-	} else {
-		fmt.Println(err)
+		s, _ := json.MarshalIndent(u, "", "\t")
+		fmt.Println(string(s))
+		return c.JSONPretty(http.StatusOK, u, "\t")
 	}
+	fmt.Println("ERROR IS NOT NIL")
+	fmt.Println(err)
 
 	return c.String(http.StatusInternalServerError, "")
 }

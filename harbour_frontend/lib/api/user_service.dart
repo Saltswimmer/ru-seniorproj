@@ -5,12 +5,15 @@ import 'package:harbour_frontend/models/token.dart';
 class UserService {
   final Dio dio = Dio();
 
+  final String server = 'http://localhost:1323';
+
   UserService();
 
   Future<User> getUser(Token jwt) async {
     try {
-      final res =
-          await dio.get('http://localhost:1323/user', data: jwt.toJson());
+      final res = await dio.get('$server/user', options: Options(
+        headers: {'authorization': jwt.accessToken}
+      ));
 
       return User.fromJson(res.data);
     } on DioError catch (e) {
@@ -21,11 +24,21 @@ class UserService {
 
   Future<Token> signup(Map user) async {
     try {
-      final res = await dio.post('http://localhost:1323/signup', data: user);
+      final res = await dio.post('$server/signup', data: user);
       return Token.fromJSON(res.data);
     } on DioError catch (e) {
       print(e.message);
       return Future.error(Exception('Unable to register'));
+    }
+  }
+
+  Future<Token> signin(Map credentials) async {
+    try {
+      final res = await dio.post('$server/signin', data: credentials);
+      return Token.fromJSON(res.data);
+    } on DioError catch (e) {
+      print(e.message);
+      return Future.error(Exception('Unable to sign in'));
     }
   }
 }

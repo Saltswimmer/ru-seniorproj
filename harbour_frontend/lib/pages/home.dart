@@ -4,6 +4,7 @@ import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:harbour_frontend/routes.dart';
+import 'package:harbour_frontend/text_templates.dart';
 import 'package:localstorage/localstorage.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage> {
             future: getUserInfo(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return Center(child: Text("Your username is:\n${snapshot.data!.username}"));
+                return HomepageWidget(user: snapshot.data!);
               } else if (snapshot.hasError) {
                 Future.delayed(const Duration(seconds: 5),
                     () => Routes.router.pushReplacement('/login'));
@@ -56,5 +57,38 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             }));
+  }
+}
+
+class HomepageWidget extends StatelessWidget {
+  HomepageWidget({super.key, required this.user});
+
+  final User user;
+  late final ColorScheme colors;
+
+  void logout() {
+    final ls = LocalStorage('harbour.json');
+    ls.deleteItem('access_token');
+    Routes.router.pushReplacement('/login');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    colors = Theme.of(context).colorScheme;
+
+    return Center(
+        child: FittedBox(
+      child: Column(
+        children: [
+          Text("Your username is:\n${user.username}"),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+                onPressed: () => logout(),
+                child: TextTemplates.medium('Log out', colors.onSurface)),
+          ),
+        ],
+      ),
+    ));
   }
 }
