@@ -3,35 +3,42 @@ import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/models/token.dart';
 
 class UserService {
-  final String usersURL = 'http://localhost:5000/users';
   final Dio dio = Dio();
+
+  final String server = 'http://localhost:1323';
 
   UserService();
 
-  Future<List<User>> getUsers() async {
-    late List<User> users;
+  Future<User> getUser(Token jwt) async {
     try {
-      final res = await dio.get(usersURL);
+      final res = await dio.get('$server/user', options: Options(
+        headers: {'authorization': jwt.accessToken}
+      ));
 
-      users = res.data['users']
-          .map<User>(
-            (item) => User.fromJson(item),
-          )
-          .toList();
+      return User.fromJson(res.data);
     } on DioError catch (e) {
-      users = [];
+      print(e.message);
+      return Future.error(Exception('Unable to retrieve user'));
     }
-
-    return users;
   }
 
   Future<Token> signup(Map user) async {
     try {
-      final res = await dio.post('http://localhost:1323/signup', data: user);
+      final res = await dio.post('$server/signup', data: user);
       return Token.fromJSON(res.data);
     } on DioError catch (e) {
       print(e.message);
-      return const Token(accessToken: null, tokenType: null);
+      return Future.error(Exception('Unable to register'));
+    }
+  }
+
+  Future<Token> signin(Map credentials) async {
+    try {
+      final res = await dio.post('$server/signin', data: credentials);
+      return Token.fromJSON(res.data);
+    } on DioError catch (e) {
+      print(e.message);
+      return Future.error(Exception('Unable to sign in'));
     }
   }
 }

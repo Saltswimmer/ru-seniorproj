@@ -24,6 +24,10 @@ table "users" {
         null = false
         type = text
     }
+    column "pass_hash" {
+        null = false
+        type = text
+    }
     column "date_created" {
         null = false
         type = timestamp
