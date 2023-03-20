@@ -15,9 +15,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
 
 type signupReq struct {
@@ -30,8 +30,8 @@ type signupReq struct {
 }
 
 type signinReq struct {
-	Email	   string `json:"email"`
-	Password   string `json:"password`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type User struct {
@@ -94,7 +94,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 		}
 	}
 
-	if (!util.CheckHash(req.Password, hash)) {
+	if !util.CheckHash(req.Password, hash) {
 		return c.String(http.StatusUnauthorized, "")
 	}
 
@@ -108,7 +108,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 func (h *Handler) GetUser(c echo.Context) error {
 
 	id := c.Param("id")
-	fmt.Printf("LOOKING UP USER FOR ID %s\n", id)
+	fmt.Printf("LOOKING UP USER FOR ID '%s'\n", id)
 
 	//define the sql statement to use for this endpoint
 	q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
@@ -132,22 +132,16 @@ func (h *Handler) GetUser(c echo.Context) error {
 
 // Query a user using an access token instead of the id
 func (h *Handler) GetUserByToken(c echo.Context) error {
+	fmt.Println("*** GET USER BY TOKEN...")
+	claims := util.GetClaimsFromRequest(c)
 
-	var token_param string
-	token_param = c.Request().Header.Get("authorization")
-
-	// Check if token is valid
-	claims, err := util.CheckToken(token_param)
+	id, err := uuid.Parse(claims.MapClaims["user"].(string))
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
-		
-	id, err := uuid.Parse(claims.MapClaims["user"].(string))		
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
+
+	fmt.Printf("*** UESR ID IS '%s'", id.String())
 
 	//define the sql statement to use for this endpoint
 	q := `SELECT first_name, middle_name, last_name, username, email FROM users WHERE user_id = $1`
