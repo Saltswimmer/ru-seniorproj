@@ -1,9 +1,11 @@
 package util
 
 import (
-	"time"
 	"errors"
+	"time"
+
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/labstack/echo/v4"
 )
 
 // Change me to a better key!!!
@@ -15,7 +17,7 @@ type AuthResponse struct {
 }
 
 type UserTokenClaims struct {
-	email string `json:"email"`
+	Email string `json:"email"`
 	jwt.MapClaims
 }
 
@@ -24,9 +26,9 @@ func GenerateUserToken(id string, email string) (AuthResponse, error) {
 	claims := UserTokenClaims{
 		email,
 		jwt.MapClaims{
-			"exp": time.Now().Add(10 * time.Minute).Unix(),
+			"exp":        time.Now().Add(10 * time.Minute).Unix(),
 			"authorized": true,
-			"user": id}}
+			"user":       id}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	tokenString, err := token.SignedString(SampleSecretKey)
@@ -50,4 +52,10 @@ func CheckToken(token_string string) (*UserTokenClaims, error) {
 	} else {
 		return nil, errors.New("Invalid token") // Maybe give more descriptive errors
 	}
+}
+
+func GetClaimsFromRequest(c echo.Context) *UserTokenClaims {
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(*UserTokenClaims)
+	return claims
 }
