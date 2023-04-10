@@ -11,7 +11,12 @@ class Token {
   }
 
   Map<String, dynamic> toJson() => {
-    'access_token': accessToken,
-    'token_type': tokenType,
-  };
+        'access_token': accessToken,
+        'token_type': tokenType,
+      };
+
+  @override
+  String toString() {
+    return "$tokenType $accessToken";
+  }
 }
