@@ -15,14 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var testEcho *echo.Echo
-var testHandler *Handler
-
-func init() {
-	testHandler, _ = LoadHandler()
-	testEcho = LoadRouter(testHandler)
-}
-
 func makeRequest(method, url string, body interface{}, accessToken string) (*http.Request, *httptest.ResponseRecorder) {
 	requestBody, _ := json.Marshal(body)
 
@@ -39,7 +31,7 @@ func makeRequest(method, url string, body interface{}, accessToken string) (*htt
 }
 
 // Complete the signup process, return the AuthResponse
-func doSignup(u signupReq, t *testing.T) (ar util.AuthResponse) {
+func DoSignup(u signupReq, t *testing.T) (ar util.AuthResponse) {
 	req, rec := makeRequest(http.MethodPost, "/signup", u, "")
 	c := testEcho.NewContext(req, rec)
 	if assert.NoError(t, testHandler.SignUp(c)) {
@@ -51,7 +43,7 @@ func doSignup(u signupReq, t *testing.T) (ar util.AuthResponse) {
 	return
 }
 
-func parseUserIdFromToken(tokenString string, t *testing.T) (userId string) {
+func ParseUserIdFromToken(tokenString string, t *testing.T) (userId string) {
 	fmt.Println(tokenString)
 	token, err := jwt.ParseWithClaims(
 		tokenString,
@@ -72,8 +64,8 @@ func parseUserIdFromToken(tokenString string, t *testing.T) (userId string) {
 
 func TestSignup(t *testing.T) {
 	u := signupReq{FirstName: "Jim", MiddleName: "Bob", LastName: "Cooter", UserName: "jimbob", Email: "jimbob@foo.bar", Password: "pass"}
-	ar := doSignup(u, t)
-	userId := parseUserIdFromToken(ar.AccessToken, t)
+	ar := DoSignup(u, t)
+	userId := ParseUserIdFromToken(ar.AccessToken, t)
 
 	// Call get user, passing up the user id
 	req, rec := makeRequest(http.MethodGet, "/users/:id", nil, "")
@@ -102,7 +94,7 @@ func TestGetUserByToken(t *testing.T) {
 	// This endpoint is restricted
 	// ensure that we add the auth header appropriately
 	u := signupReq{FirstName: "Jim", MiddleName: "Bob", LastName: "Cooter", UserName: "jimbob", Email: "jimbob2@foo.bar", Password: "pass"}
-	ar := doSignup(u, t)
+	ar := DoSignup(u, t)
 
 	// Call get user, passing up the access token as the AUTH header
 	req, rec := makeRequest(http.MethodGet, "/restricted/user", nil, ar.AccessToken)

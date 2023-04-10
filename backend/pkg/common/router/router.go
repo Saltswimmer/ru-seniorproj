@@ -24,6 +24,14 @@ const (
 	dbname   = "test"
 )
 
+var testEcho *echo.Echo
+var testHandler *Handler
+
+func init() {
+	testHandler, _ = LoadHandler()
+	testEcho = LoadRouter(testHandler)
+}
+
 func LoadHandler() (*Handler, error) {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -57,6 +65,6 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	}
 	restricted.Use(echojwt.WithConfig(config))
 	restricted.GET("/user", handler.GetUserByToken)
-
+	restricted.POST("/vessels", handler.CreateVessel)
 	return e
 }
