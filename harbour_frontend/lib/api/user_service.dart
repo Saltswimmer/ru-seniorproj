@@ -10,10 +10,11 @@ class UserService {
   UserService();
 
   Future<User> getUser(Token jwt) async {
+    print(jwt.toString());
     try {
-      final res = await dio.get('$server/user', options: Options(
-        headers: {'authorization': jwt.accessToken}
-      ));
+      final res = await dio.get('$server/restricted/user',
+          options:
+              Options(headers: {'Authorization': jwt.toString()}));
 
       return User.fromJson(res.data);
     } on DioError catch (e) {

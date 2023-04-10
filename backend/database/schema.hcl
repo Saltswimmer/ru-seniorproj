@@ -37,13 +37,13 @@ table "users" {
     }
 }
 
-table "servers" {
+table "vessel" {
     schema = schema.public
-    column "server_id" {
+    column "id" {
         null = false
         type = text
     }
-    column "server_name" {
+    column "name" {
         null = true
         type = text
     }
@@ -56,7 +56,7 @@ table "servers" {
         type = text
     }
     primary_key {
-        columns = [column.server_id]
+        columns = [column.id]
     }
 }
 
