@@ -87,6 +87,12 @@ class HomepageWidget extends StatelessWidget {
                 onPressed: () => logout(),
                 child: TextTemplates.medium('Log out', colors.onSurface)),
           ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+                onPressed: () => Routes.router.pushReplacement('/vesseltest'),
+                child: TextTemplates.medium('Go to vessel', colors.onSurface)),
+          ),
         ],
       ),
     ));

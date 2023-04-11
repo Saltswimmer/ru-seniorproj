@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/pages/landing.dart';
 import 'package:harbour_frontend/pages/credentials.dart';
 import 'package:harbour_frontend/pages/home.dart';
+import 'package:harbour_frontend/pages/vessel/vessel.dart';
 
 class Routes {
   static final GoRouter router = GoRouter(routes: <RouteBase>[
@@ -25,7 +26,11 @@ class Routes {
           GoRoute(
             path: 'home',
             builder: (BuildContext context, GoRouterState state) =>
-              const HomePage(),)
+              const HomePage(),),
+          GoRoute(
+            path: 'vesseltest',
+            builder: (BuildContext context, GoRouterState state) =>
+              const VesselPage(),)
         ])
   ]);
 }
