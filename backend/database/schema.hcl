@@ -51,12 +51,8 @@ table "vessel" {
         null = false
         type = timestamp
     }
-    column "admin" {
-        null = false
-        type = text
-    }
     primary_key {
-        columns = [column.id]
+        columns = [column.vessel_id]
     }
 }
 
@@ -75,6 +71,10 @@ table "users_vessels" {
         null = false
         type = text
         references = "user(id)"
+    }
+    column "admin" {
+        null = false
+        type = text
     }
     primary_key {
         columns = [column.user_vessel_id]
