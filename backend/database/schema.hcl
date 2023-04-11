@@ -39,7 +39,7 @@ table "users" {
 
 table "vessel" {
     schema = schema.public
-    column "id" {
+    column "vessel_id" {
         null = false
         type = text
     }
@@ -57,6 +57,27 @@ table "vessel" {
     }
     primary_key {
         columns = [column.id]
+    }
+}
+
+table "users_vessels" {
+    schema = schema.public
+    column "user_vessel_id" {
+        null = false
+        type = text
+    }
+    column "vessel_id" {
+        null = false
+        type = text
+        references = "vessel(id)"
+    }
+    column "user_id" {
+        null = false
+        type = text
+        references = "user(id)"
+    }
+    primary_key {
+        columns = [column.user_vessel_id]
     }
 }
 
@@ -107,6 +128,24 @@ table "message" {
     }
     primary_key {
         columns = [column.message_id]
+    }
+}
+
+table "following" {
+    schema = schema.public
+    column "relationship_id" {
+        null = false
+        type = text
+    }
+    column "follower_id" {
+        null = false
+        type = text
+        references = "user(id)"
+    }
+    column "following_id" {
+        null = false
+        type = text
+        references = "user(id)"
     }
 }
 
