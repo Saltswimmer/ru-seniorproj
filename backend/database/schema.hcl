@@ -147,6 +147,7 @@ table "following" {
         type = text
         references = "user(id)"
     }
+    
 }
 
 schema "public" {
