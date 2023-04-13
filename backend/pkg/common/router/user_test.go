@@ -26,7 +26,7 @@ func makeRequest(method, url string, body interface{}, accessToken string) (*htt
 		req.Header.Add("Authorization", "Bearer "+accessToken)
 	}
 	rec := httptest.NewRecorder()
-
+	//fmt.Println(rec)
 	return req, rec
 }
 

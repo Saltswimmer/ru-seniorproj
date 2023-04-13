@@ -23,6 +23,7 @@ table "users" {
     column "email" {
         null = false
         type = text
+		unique = true
     }
     column "pass_hash" {
         null = false
@@ -37,7 +38,7 @@ table "users" {
     }
 }
 
-table "vessel" {
+table "vessels" {
     schema = schema.public
     column "vessel_id" {
         null = false
@@ -65,16 +66,18 @@ table "users_vessels" {
     column "vessel_id" {
         null = false
         type = text
-        references = "vessel(id)"
     }
     column "user_id" {
         null = false
         type = text
-        references = "user(id)"
     }
-    column "admin" {
+    column "is_admin" {
         null = false
         type = text
+    }
+	column "date_created" {
+        null = false
+        type = timestamp
     }
     primary_key {
         columns = [column.user_vessel_id]
@@ -147,7 +150,7 @@ table "following" {
         type = text
         references = "user(id)"
     }
-    
+
 }
 
 schema "public" {

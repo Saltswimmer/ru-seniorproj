@@ -3,7 +3,7 @@ package util
 import (
 	"errors"
 	"time"
-
+	"fmt"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -26,7 +26,7 @@ func GenerateUserToken(id string, email string) (AuthResponse, error) {
 	claims := UserTokenClaims{
 		email,
 		jwt.MapClaims{
-			"exp":        time.Now().Add(10 * time.Minute).Unix(),
+			"exp":        time.Now().Add(24 * time.Hour).Unix(),
 			"authorized": true,
 			"user":       id}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -50,6 +50,7 @@ func CheckToken(token_string string) (*UserTokenClaims, error) {
 	if claims, ok := token.Claims.(*UserTokenClaims); ok && token.Valid {
 		return claims, nil
 	} else {
+		fmt.Println("Error in token parsing")
 		return nil, errors.New("Invalid token") // Maybe give more descriptive errors
 	}
 }

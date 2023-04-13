@@ -90,6 +90,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 	err = row.Scan(&id, &hash)
 	if err == nil {
 		if err == sql.ErrNoRows {
+			//fmt.Println("1")
 			return c.String(http.StatusNotFound, "")
 		}
 	}
@@ -118,6 +119,7 @@ func (h *Handler) GetUser(c echo.Context) error {
 	err := row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
 	if err == nil {
 		if err == sql.ErrNoRows {
+			//fmt.Println("2")
 			return c.String(http.StatusNotFound, "")
 		}
 
@@ -151,6 +153,7 @@ func (h *Handler) GetUserByToken(c echo.Context) error {
 	err = row.Scan(&u.FirstName, &u.MiddleName, &u.LastName, &u.UserName, &u.Email)
 	if err == nil {
 		if err == sql.ErrNoRows {
+			//fmt.Println("3")
 			return c.String(http.StatusNotFound, "")
 		}
 

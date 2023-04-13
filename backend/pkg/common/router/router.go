@@ -66,5 +66,8 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	restricted.Use(echojwt.WithConfig(config))
 	restricted.GET("/user", handler.GetUserByToken)
 	restricted.POST("/vessels", handler.CreateVessel)
+	restricted.GET("/getVessel", handler.GetVessel)
+	restricted.POST("/joinVessel", handler.JoinVessel)
+	restricted.GET("/getUsers", handler.GetUsers)
 	return e
 }
