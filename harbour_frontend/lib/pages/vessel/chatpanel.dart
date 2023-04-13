@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:harbour_frontend/models/message.dart';
+import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/text_templates.dart';
 
 class ChatPanel extends StatefulWidget {
@@ -101,14 +102,13 @@ class _ChatPanelState extends State<ChatPanel> {
                 IconButton(
                     onPressed: () async {
                       if (_chat.text.isNotEmpty) {
-                        print('test');
                         switch (cbState) {
                           case ChatboxState.chat:
                             setState(() {
                               DateTime now = DateTime.now();
                               messages.add(Message(
                                   body: _chat.text,
-                                  sender: "Placeholder",
+                                  sender: Session.user!.username,
                                   timestamp: DateTime.now())
                                 );
                             });
