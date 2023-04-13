@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:harbour_frontend/models/session.dart';
 import 'dart:async';
 import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/models/user_model.dart';
-import 'package:harbour_frontend/api/user_service.dart';
 import 'package:harbour_frontend/routes.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:localstorage/localstorage.dart';
@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<User> getUserInfo() async {
+  Future<bool> validateSession() async {
     late Token jwt;
     try {
       final ls = LocalStorage('harbour.json');
@@ -26,23 +26,23 @@ class _HomePageState extends State<HomePage> {
     }
 
     try {
-      return await UserService().getUser(jwt).timeout(
-          const Duration(seconds: 15),
-          onTimeout: () =>
-              Future.error(Exception('Get user request timed out')));
+      return await Session.refresh()
+          .timeout(const Duration(seconds: 10), onTimeout: () => false);
     } on Exception catch (e) {
-      return Future.error(Exception('Unable to retrive user information'));
+      return false;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FutureBuilder<User>(
-            future: getUserInfo(),
+        body: FutureBuilder<bool>(
+            future: Session.refresh(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return HomepageWidget(user: snapshot.data!);
+              if (snapshot.hasData && snapshot.data!) {
+                return HomepageWidget(user: Session.user!);
+              } else if (snapshot.hasData && !snapshot.data!) {
+                Routes.router.pushReplacement('/login');
               } else if (snapshot.hasError) {
                 Future.delayed(const Duration(seconds: 5),
                     () => Routes.router.pushReplacement('/login'));

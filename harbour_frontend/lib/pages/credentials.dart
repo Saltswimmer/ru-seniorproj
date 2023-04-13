@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
@@ -14,18 +15,15 @@ class CredentialsPageMixin {
 
   InputDecoration makeInputDecoration(String hint) {
     return InputDecoration(
-      hintText: hint,
-      labelStyle: TextStyle(color: colors.surface),
-      errorStyle: TextStyle(color: colors.secondary),
-      errorBorder: UnderlineInputBorder(
-        borderSide: BorderSide(
-          color: colors.secondary
-        )
-      ),
-      border: UnderlineInputBorder(
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(6.0),
-              topRight: Radius.circular(4.0))));
+        hintText: hint,
+        labelStyle: TextStyle(color: colors.surface),
+        errorStyle: TextStyle(color: colors.secondary),
+        errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: colors.secondary)),
+        border: UnderlineInputBorder(
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(6.0),
+                topRight: Radius.circular(4.0))));
   }
 
   Widget build(BuildContext context) {
@@ -166,22 +164,15 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
                         final password = _password.text;
 
                         if (_formKey.currentState!.validate()) {
-                          late Token jwt;
                           try {
-                            jwt = await UserService().signin({
+                            UserService().signin({
                               'email': email,
                               'password': password,
                             });
-                            try {
-                              final ls = LocalStorage('harbour.json');
-                              //print(jwt.accessToken);
-                              ls.setItem('access_token', jwt);
-                            } catch (e) {
-                              print(e.toString());
-                            }
                             Routes.router.pushReplacement('/');
                           } on Exception catch (e) {
                             print(e.toString());
+                            Session.upToDate = false;
                           }
                         }
                       },
@@ -329,9 +320,8 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     final password = _password.text;
 
                     if (_formKey.currentState!.validate()) {
-                      late Token jwt;
                       try {
-                        jwt = await UserService().signup({
+                        UserService().signup({
                           'first_name': '',
                           'middle_name': '',
                           'last_name': '',
@@ -339,14 +329,6 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                           'username': username,
                           'password': password,
                         });
-
-                        try {
-                          final ls = LocalStorage('harbour.json');
-                          //print(jwt.accessToken);
-                          ls.setItem('access_token', jwt);
-                        } catch (e) {
-                          print(e.toString());
-                        }
                         Routes.router.pushReplacement('/');
                       } on Exception catch (e) {
                         print(e.toString());
