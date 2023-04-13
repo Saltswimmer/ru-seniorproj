@@ -10,7 +10,6 @@ class UserService {
   UserService();
 
   Future<User> getUser(Token jwt) async {
-    print(jwt.toString());
     try {
       final res = await dio.get('$server/restricted/user',
           options:
