@@ -1,22 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:harbour_frontend/models/user_model.dart';
-import 'package:harbour_frontend/pages/vessel/vessel.dart';
 
 //THIS FILE IS CURRENTLY STANDALONE AND WILL HAVE TO BE INTEGRATED
 //TO INCLUDE THE CORRECT DATA STRUCTURES AND JSON REQUESTS FROM
 //VESSELS.dart FILE
 
-class UserList extends StatefulWidget {
-  List<User> users;
-  UserList({required this.users});
+class VesselList extends StatefulWidget {
+  final List<Vessel> users;
+
+  VesselList({required this.users});
 
   @override
-  _UserListState createState() => _UserListState();
+  _VesselListState createState() => _VesselListState();
 }
 
-class _UserListState extends State<UserList> {
+class _VesselListState extends State<VesselList> {
 
   @override
   Widget build(BuildContext context) {
