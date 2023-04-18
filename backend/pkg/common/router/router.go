@@ -69,5 +69,6 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	restricted.GET("/getVessel", handler.GetVessel)
 	restricted.POST("/joinVessel", handler.JoinVessel)
 	restricted.GET("/getUsers", handler.GetUsers)
+	restricted.GET("/searchVessels", handler.SearchVessels)
 	return e
 }
