@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/models/token.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:localstorage/localstorage.dart';
 
 import '../models/session.dart';
@@ -37,8 +38,7 @@ class UserService {
   Future<User> getUser(Token jwt) async {
     try {
       final res = await dio.get('$server/user/',
-          options:
-              Options(headers: {'Authorization': jwt.toString()}));
+          options: Options(headers: {'Authorization': jwt.toString()}));
 
       return User.fromJson(res.data);
     } on DioError catch (e) {
