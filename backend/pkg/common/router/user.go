@@ -42,6 +42,12 @@ type User struct {
 	Email      string `json:"email"`
 }
 
+type getUserVesselsReq struct {
+	Id		  string `json:"user_id"`
+}
+
+//using searchVesselRow and searchVessel structs from vessel.go for response, since they are the same response structure
+
 func (h *Handler) SignUp(c echo.Context) error {
 
 	var req signupReq
@@ -165,4 +171,56 @@ func (h *Handler) GetUserByToken(c echo.Context) error {
 	fmt.Println(err)
 
 	return c.String(http.StatusInternalServerError, "")
+}
+
+//TODO: make unit tests for this, update vessel.go func
+func (h *Handler) GetUserVessels (c echo.Context) error {
+	fmt.Println("GETTING A USERS VESSEL LIST")
+
+	var req getUserVesselsReq
+	err := c.Bind(&req)
+	if err != nil {
+		return err
+	}
+
+	var list searchVessel
+
+	//define the sql statement to use for this endpoint
+	q := `SELECT name, users_vessels.vessel_id FROM users_vessels INNER JOIN vessels ON users_vessels.vessel_id = vessels.vessel_id WHERE user_id = $1`
+	rows, err := h.db.Query(q, req.Id)
+	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+	//fmt.Println(rows.Columns())
+	for rows.Next(){
+		var vessel searchVesselRow
+		err = rows.Scan(&vessel.Vessel, &vessel.Id)
+		//fmt.Println("Vessel ")
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		//fmt.Println("Got here")
+		list.Vessels = append(list.Vessels, vessel)
+
+	}
+
+	err = rows.Err()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.String(http.StatusNotFound, "")
+		} else {
+			fmt.Println("ERROR IS NOT NIL")
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "")
+		}
+	}
+
+	//fmt.Println(list)
+	return c.JSONPretty(http.StatusOK, list, "\t")
+
+
+
 }

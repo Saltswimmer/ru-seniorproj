@@ -43,6 +43,7 @@ type usersInVesselReq struct {
 type userListMember struct {
 	User_Id		string `json:"user_id"`
 	Admin		string `json:"admin"`
+	Username	string `json:"username"`
 }
 
 type usersInVessel struct {
@@ -167,7 +168,7 @@ func (h *Handler) GetUsers(c echo.Context) error {
 	var list usersInVessel
 
 	//define the sql statement to use for this endpoint
-	q := `SELECT user_id, is_admin FROM users_vessels WHERE vessel_id = $1`
+	q := `SELECT users_vessels.user_id, is_admin, username FROM users_vessels INNER JOIN users ON users_vessels.user_id = users.user_id WHERE vessel_id = $1`
 	rows, err := h.db.Query(q, req.Vessel)
 	if err != nil {
 		return err
@@ -175,7 +176,7 @@ func (h *Handler) GetUsers(c echo.Context) error {
 	defer rows.Close()
 	for rows.Next(){
 		var user userListMember
-		err = rows.Scan(&user.User_Id, &user.Admin)
+		err = rows.Scan(&user.User_Id, &user.Admin, &user.Username)
 		if err != nil {
 			fmt.Println(err)
 			return err
