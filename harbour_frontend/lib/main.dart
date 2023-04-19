@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
-import 'package:harbour_frontend/api/user_service.dart';
-import 'package:harbour_frontend/models/user_model.dart';
 
 void main() {
   runApp(MaterialApp.router(
@@ -20,13 +18,19 @@ void main() {
       scaffoldBackgroundColor: scheme.background,
       progressIndicatorTheme: ProgressIndicatorThemeData(
         circularTrackColor: scheme.secondary,
-        
+
       ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        surfaceTintColor: Colors.white,
+      )),
       elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.white,
-        
+
       )),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -56,7 +60,7 @@ void main() {
 const ColorScheme scheme = ColorScheme.highContrastDark(
     background: Color(0xff1f2f3f),
     onBackground: Color(0xfff0f0f0),
-    primary: Color(0xff445566),
+    primary: Color(0xff334455),
     onPrimary: Colors.white,
     secondary: Color(0xffff7f5f),
     onSecondary: Colors.black,

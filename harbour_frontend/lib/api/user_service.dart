@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/models/token.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:localstorage/localstorage.dart';
 
 import '../models/session.dart';
@@ -37,10 +38,25 @@ class UserService {
   Future<User> getUser(Token jwt) async {
     try {
       final res = await dio.get('$server/restricted/user',
-          options:
-              Options(headers: {'Authorization': jwt.toString()}));
+          options: Options(headers: {'Authorization': jwt.toString()}));
 
       return User.fromJson(res.data);
+    } on DioError catch (e) {
+      print(e.message);
+      return Future.error(Exception('Unable to retrieve user'));
+    }
+  }
+
+  Future<List<Vessel>> getJoinedVessels(Token jwt) async {
+    try {
+      final res = await dio.get('$server/restricted/uservessels',
+          options: Options(headers: {'Authorization': jwt.toString()}));
+
+      List<Vessel> ret = [];
+      for (dynamic v in res.data) {
+        ret.add(Vessel.fromJson(v));
+      }
+      return ret;
     } on DioError catch (e) {
       print(e.message);
       return Future.error(Exception('Unable to retrieve user'));
