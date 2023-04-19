@@ -37,7 +37,7 @@ class UserService {
 
   Future<User> getUser(Token jwt) async {
     try {
-      final res = await dio.get('$server/restricted/user',
+      final res = await dio.get('$server/user/',
           options:
               Options(headers: {'Authorization': jwt.toString()}));
 

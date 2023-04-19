@@ -97,7 +97,7 @@ func TestGetUserByToken(t *testing.T) {
 	ar := DoSignup(u, t)
 
 	// Call get user, passing up the access token as the AUTH header
-	req, rec := makeRequest(http.MethodGet, "/restricted/user", nil, ar.AccessToken)
+	req, rec := makeRequest(http.MethodGet, "/user/", nil, ar.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
