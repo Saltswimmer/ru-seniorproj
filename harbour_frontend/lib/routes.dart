@@ -6,6 +6,7 @@ import 'package:harbour_frontend/pages/credentials.dart';
 import 'package:harbour_frontend/pages/home.dart';
 import 'package:harbour_frontend/pages/vessel/vessel.dart';
 import 'package:harbour_frontend/models/user_model.dart';
+import 'package:harbour_frontend/api/vessel_service.dart';
 
 class Routes {
   static final GoRouter router = GoRouter(routes: <RouteBase>[
@@ -31,9 +32,7 @@ class Routes {
           GoRoute(
             path: 'vesseltest',
             builder: (BuildContext context, GoRouterState state) =>
-              VesselPage(users: 
-              [const User(username: "John", email: "john@example.com"),
-               const User(username: "Mary", email: "mary@example.com")]))
+              VesselPage())
         ])
   ]);
 }
