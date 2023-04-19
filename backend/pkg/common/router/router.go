@@ -55,20 +55,24 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	e.POST("/signin", handler.SignIn)
 	e.GET("/users/:id", handler.GetUser)
 
-	restricted := e.Group("/restricted")
-
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(util.UserTokenClaims)
 		},
 		SigningKey: util.SampleSecretKey,
 	}
-	restricted.Use(echojwt.WithConfig(config))
-	restricted.GET("/user", handler.GetUserByToken)
-	restricted.POST("/vessels", handler.CreateVessel)
-	restricted.GET("/getVessel", handler.GetVessel)
-	restricted.POST("/joinVessel", handler.JoinVessel)
-	restricted.GET("/getUsers", handler.GetUsers)
-	restricted.GET("/searchVessels", handler.SearchVessels)
+
+  user := e.Group("/user")
+	user.Use(echojwt.WithConfig(config))
+  user.GET("/", handler.GetUserByToken)
+
+  vessel := e.Group("/vessel")
+  vessel.Use(echojwt.WithConfig(config))
+  vessel.POST("/new", handler.CreateVessel)
+	vessel.GET("/", handler.GetVessel)
+	vessel.POST("/join", handler.JoinVessel)
+	vessel.GET("/members", handler.GetUsers)
+	vessel.GET("/search", handler.SearchVessels)
+
 	return e
 }
