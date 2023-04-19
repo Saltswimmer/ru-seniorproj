@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:harbour_frontend/api/vessel_service.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'dart:async';
 import 'package:harbour_frontend/models/token.dart';
@@ -6,6 +8,8 @@ import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/routes.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:localstorage/localstorage.dart';
+
+import '../models/vessel_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -60,11 +64,52 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomepageWidget extends StatelessWidget {
+class HomepageWidget extends StatefulWidget {
   HomepageWidget({super.key, required this.user});
 
   final User user;
-  late final ColorScheme colors;
+
+  @override
+  State<HomepageWidget> createState() => _HomepageWidgetState();
+}
+
+class _HomepageWidgetState extends State<HomepageWidget> {
+  bool _onlyMine = true;
+  bool _showVessels = true;
+  bool _showDMs = true;
+
+  String _searchQuery = '';
+
+  late final TextEditingController _controller;
+
+  List<Vessel> _searchResults = [];
+
+  Future<void> search() async {
+    if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
+
+    try {
+      _searchResults = await VesselService().search(_searchQuery, Session.token!);
+    } on Error catch (e) {
+      print(e);
+      return;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+    _controller.addListener(() {
+          _searchQuery = _controller.text;
+          search();
+        });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void logout() {
     final ls = LocalStorage('harbour.json');
@@ -74,27 +119,110 @@ class HomepageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    colors = Theme.of(context).colorScheme;
+    ColorScheme colors = Theme.of(context).colorScheme;
 
-    return Center(
-        child: FittedBox(
-      child: Column(
-        children: [
-          Text("Your username is:\n${user.username}"),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-                onPressed: () => logout(),
-                child: TextTemplates.medium('Log out', colors.onSurface)),
+    final _formKey = GlobalKey<FormState>();
+
+    return Row(
+      children: [
+        LimitedBox(
+          maxWidth: 150,
+          child: Container(
+            color: colors.primary,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                    child: CircleAvatar(
+                      backgroundColor: colors.onPrimary,
+                    ),
+                  ),
+                  TextTemplates.headline(
+                      Session.user!.username, colors.onPrimary)
+                ],
+              ),
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-                onPressed: () => Routes.router.pushReplacement('/vesseltest'),
-                child: TextTemplates.medium('Go to vessel', colors.onSurface)),
-          ),
-        ],
-      ),
-    ));
+        ),
+        Expanded(
+            child: Column(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Flexible(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextTemplates.heavy(
+                          "Browse conversations", colors.onBackground),
+                      TextFormField(
+                        key: _formKey,
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                            hintText: "Search for conversations"),
+                      ),
+                    ],
+                  )),
+                  Flexible(
+                    child: ListView(
+                      children: <CheckboxListTile>[
+                        CheckboxListTile(
+                            value: _onlyMine,
+                            title: TextTemplates.medium(
+                                "Only show your conversations",
+                                colors.onBackground),
+                            tileColor: colors.background,
+                            onChanged: (v) => setState(() {
+                                  if (v != null) _onlyMine = v;
+                                })),
+                        CheckboxListTile(
+                            value: _showVessels,
+                            title: TextTemplates.medium(
+                                "Show vessels", colors.onBackground),
+                            tileColor: colors.background,
+                            onChanged: (v) => setState(() {
+                                  if (v != null) _showVessels = v;
+                                })),
+                        CheckboxListTile(
+                            value: _showDMs,
+                            title: TextTemplates.medium(
+                                "Show direct message conversations",
+                                colors.onBackground),
+                            tileColor: colors.background,
+                            onChanged: (v) => setState(() {
+                                  if (v != null) _showDMs = v;
+                                })),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: DataTable(
+                  columns: [
+                    DataColumn(
+                        label:
+                            TextTemplates.large("Name", colors.onBackground)),
+                    DataColumn(
+                        label: TextTemplates.large(
+                            "Members", colors.onBackground)),
+                  ],
+                  rows: _searchResults
+                      .map<DataRow>((e) => DataRow(
+                          cells: [DataCell(Text(e.name)), DataCell(Text('0'))]))
+                      .toList()),
+            )
+          ],
+        )),
+      ],
+    );
   }
 }
