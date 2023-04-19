@@ -1,4 +1,6 @@
 import 'package:harbour_frontend/api/user_service.dart';
+import 'package:localstorage/localstorage.dart';
+import 'package:harbour_frontend/routes.dart';
 
 import 'token.dart';
 import 'user_model.dart';
@@ -39,5 +41,12 @@ class Session {
     _sessionUser = user;
     upToDate = true;
     return true;
+  }
+
+  static void logout() {
+    final ls = LocalStorage('harbour.json');
+    ls.deleteItem('access_token');
+    upToDate = false;
+    Routes.router.push('/login');
   }
 }

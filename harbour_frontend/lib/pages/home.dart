@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:harbour_frontend/common/avatar.dart';
+import 'package:harbour_frontend/common/navbar.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'dart:async';
 import 'package:harbour_frontend/models/token.dart';
@@ -6,6 +8,7 @@ import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/routes.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,12 +18,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late User user;
+
+  var vessels = <Vessel>[];
+
   Future<bool> validateSession() async {
-    late Token jwt;
     try {
       final ls = LocalStorage('harbour.json');
 
-      jwt = Token.fromJSON(ls.getItem('access_token'));
+      Token.fromJSON(ls.getItem('access_token'));
     } catch (e) {
       return Future.error(Exception('Access token not found'));
     }
@@ -33,20 +39,73 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<List<Vessel>> getJoinedVessels() async {
+    return [
+      Vessel(id: "test", name: "test"),
+      Vessel(id: "test", name: "test"),
+      Vessel(id: "test", name: "test")
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    ColorScheme colors = Theme.of(context).colorScheme;
     return Scaffold(
+        bottomNavigationBar: HarbourNavBar(index: 0),
         body: FutureBuilder<bool>(
             future: Session.refresh(),
             builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data!) {
-                return HomepageWidget(user: Session.user!);
-              } else if (snapshot.hasData && !snapshot.data!) {
+              if (snapshot.hasData && !snapshot.data!) {
                 Routes.router.pushReplacement('/login');
               } else if (snapshot.hasError) {
                 Future.delayed(const Duration(seconds: 5),
                     () => Routes.router.pushReplacement('/login'));
                 return Text(snapshot.error.toString());
+              } else if (snapshot.hasData && snapshot.data!) {
+                user = Session.user!;
+                return Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Avatar(user: user.username),
+                      ),
+                      TextTemplates.headline(
+                          user.username, colors.onBackground),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextTemplates.heavy(
+                            "Your vessels:", colors.onBackground),
+                      ),
+                      Expanded(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 500),
+                          child: FutureBuilder<List<Vessel>>(
+                              future: getJoinedVessels(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return ListView.builder(
+                                      itemCount: snapshot.data!.length,
+                                      itemBuilder: (context, index) =>
+                                          Text(snapshot.data![index].name));
+                                }
+                                return Container();
+                              }),
+                        ),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.search),
+                        label: TextTemplates.heavy(
+                            "Browse vessels", colors.onSurface),
+                        onPressed: () {
+                          Routes.router.push('/browse/vessels');
+                        },
+                      ),
+                    ],
+                  ),
+                );
               }
               return Center(
                 child: ConstrainedBox(
@@ -57,44 +116,5 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             }));
-  }
-}
-
-class HomepageWidget extends StatelessWidget {
-  HomepageWidget({super.key, required this.user});
-
-  final User user;
-  late final ColorScheme colors;
-
-  void logout() {
-    final ls = LocalStorage('harbour.json');
-    ls.deleteItem('access_token');
-    Routes.router.pushReplacement('/login');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    colors = Theme.of(context).colorScheme;
-
-    return Center(
-        child: FittedBox(
-      child: Column(
-        children: [
-          Text("Your username is:\n${user.username}"),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-                onPressed: () => logout(),
-                child: TextTemplates.medium('Log out', colors.onSurface)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-                onPressed: () => Routes.router.pushReplacement('/vesseltest'),
-                child: TextTemplates.medium('Go to vessel', colors.onSurface)),
-          ),
-        ],
-      ),
-    ));
   }
 }

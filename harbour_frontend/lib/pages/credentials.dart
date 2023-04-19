@@ -246,6 +246,8 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter an email address';
+                  } else if (!RegExp(r'.+@.+\..+').hasMatch(value)) {
+                    return 'Please enter a valid email address';
                   }
                   return null;
                 },
@@ -266,6 +268,8 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                     return 'Please enter a username';
                   } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
                     return 'Only Latin alphabet letters and underscores are allowed in usernames';
+                  } else if (value.length < 3) {
+                    return 'Username must be at least 3 characters';
                   }
                   return null;
                 },
@@ -285,6 +289,11 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a password';
+                  } else if (value.length < 8) {
+                    return 'Password must be at least 8 characters';
+                  } else if (!RegExp(r'[!@#$%^&*]').hasMatch(value) ||
+                      !RegExp(r'[0-9]').hasMatch(value)) {
+                    return 'Password must contain at least one symbol and one number';
                   }
                   return null;
                 },
