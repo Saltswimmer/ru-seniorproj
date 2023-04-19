@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../models/user_model.dart';
+
 //THIS FILE IS CURRENTLY STANDALONE AND WILL HAVE TO BE INTEGRATED
 //TO INCLUDE THE CORRECT DATA STRUCTURES AND JSON REQUESTS FROM
 //VESSELS.dart FILE
