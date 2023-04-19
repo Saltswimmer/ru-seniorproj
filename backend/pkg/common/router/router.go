@@ -65,6 +65,7 @@ func LoadRouter(handler *Handler) *echo.Echo {
   user := e.Group("/user")
 	user.Use(echojwt.WithConfig(config))
   user.GET("/", handler.GetUserByToken)
+  user.GET("/getUserVessels", handler.GetUserVessels)
 
   vessel := e.Group("/vessel")
   vessel.Use(echojwt.WithConfig(config))

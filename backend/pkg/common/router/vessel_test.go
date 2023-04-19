@@ -66,6 +66,7 @@ func TestVesselFeaturesUgly(t *testing.T) {
 	vr4 := usersInVesselReq{Vessel:vessel.Id}
 	req, rec = makeRequest(http.MethodGet, "/vessel/members", vr4, ar2.AccessToken)
 	testEcho.ServeHTTP(rec, req)
+	fmt.Println(rec)
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 }
@@ -104,6 +105,12 @@ func TestSearch(t *testing.T) {
 
 	vr2 := searchVesselReq{Slug: "beard"}
 	req, rec = makeRequest(http.MethodGet, "/vessel/search", vr2, firstUser.AccessToken)
+	testEcho.ServeHTTP(rec, req)
+	fmt.Println(rec)
+	assert.Equal(t, http.StatusOK, rec.Code)
+
+	vr3 := getUserVesselsReq{Id: userId}
+	req, rec = makeRequest(http.MethodGet, "/user/getUserVessels", vr3, firstUser.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	fmt.Println(rec)
 	assert.Equal(t, http.StatusOK, rec.Code)
