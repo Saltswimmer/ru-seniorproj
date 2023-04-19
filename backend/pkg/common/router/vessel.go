@@ -48,6 +48,20 @@ type userListMember struct {
 type usersInVessel struct {
 	Users		[]userListMember `json:"users"`
 }
+
+type searchVesselReq struct {
+	Slug		string `json:"vessel_name"`
+}
+
+type searchVesselRow struct {
+	Vessel 		string `json:"vessel_name"`
+	Id			string `json:"vessel_id"`
+}
+
+type searchVessel	struct {
+	Vessels 	[]searchVesselRow `json:"vessels"`
+}
+
 func (h *Handler) CreateVessel(c echo.Context) error {
 
 	var req newVesselReq
@@ -185,5 +199,60 @@ func (h *Handler) GetUsers(c echo.Context) error {
 	//fmt.Println(list)
 	return c.JSONPretty(http.StatusOK, list, "\t")
 
+
+}
+
+func (h *Handler) SearchVessels(c echo.Context) error {
+	fmt.Println("SEARCHING VESSELS")
+
+	var req searchVesselReq
+	err := c.Bind(&req)
+	if err != nil {
+		return err
+	}
+
+	var list searchVessel
+	q := `SELECT name, vessel_id FROM vessels WHERE name LIKE $1`
+	slug := "%" + req.Slug + "%"
+	//slug = "%beard%"
+	//fmt.Println(q)
+	rows, err := h.db.Query(q, slug)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	defer rows.Close()
+	//fmt.Println(rows.Columns())
+	for rows.Next(){
+		var vessel searchVesselRow
+		err = rows.Scan(&vessel.Vessel, &vessel.Id)
+		//fmt.Println("Vessel ")
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		//fmt.Println("Got here")
+		list.Vessels = append(list.Vessels, vessel)
+
+	}
+
+	//s, _ := json.MarshalIndent(list, "", "\t")
+	//fmt.Println(string(s))
+
+	err = rows.Err()
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.String(http.StatusNotFound, "")
+		} else {
+			fmt.Println("ERROR IS NOT NIL")
+			fmt.Println(err)
+			return c.String(http.StatusInternalServerError, "")
+		}
+	}
+
+	//fmt.Println(list)
+	return c.JSONPretty(http.StatusOK, list, "\t")
 
 }
