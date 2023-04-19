@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/models/token.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:localstorage/localstorage.dart';
 
 import '../models/session.dart';
@@ -59,6 +60,20 @@ class UserService {
     } catch (e) {
       print(e.toString());
       Session.upToDate = false;
+    }
+  }
+
+  Future<List<Vessel>> getVessels(Token jwt) async {
+    try {
+      final res = await dio.get('$server/restricted/getUsers', //<-- update for backend endpoint for vessels
+          options: Options(headers: {'Authorization': jwt.toString()}));
+
+      print(res.data);
+      List<dynamic> data = res.data['vessels'];
+      return data.map((vesselJson) => Vessel.fromJson(vesselJson)).toList();
+    } on DioError catch (e) {
+      print(e.message);
+      return Future.error(Exception('Unable to retrieve vessels'));
     }
   }
 }

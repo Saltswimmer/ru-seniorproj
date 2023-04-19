@@ -1,15 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-//THIS FILE IS CURRENTLY STANDALONE AND WILL HAVE TO BE INTEGRATED
-//TO INCLUDE THE CORRECT DATA STRUCTURES AND JSON REQUESTS FROM
-//VESSELS.dart FILE
+import 'package:harbour_frontend/api/user_service.dart';
+import 'package:harbour_frontend/models/session.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 
 class VesselList extends StatefulWidget {
-  final List<Vessel> users;
-
-  VesselList({required this.users});
 
   @override
   _VesselListState createState() => _VesselListState();
@@ -19,15 +15,23 @@ class _VesselListState extends State<VesselList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.users.length,
+    return FutureBuilder(future: UserService().getVessels(Session.token!),builder: (context, snapshot) {
+    if (snapshot.hasData){
+      return ListView.builder(
+      itemCount: snapshot.data!.length,
       itemBuilder: (BuildContext context, int index) {
-        User user = widget.users[index];
+        Vessel vessel = snapshot.data![index];
         return ListTile(
-          title: Text(user.username),
-          subtitle: Text(user.email),
+          title: Text(vessel.name),
         );
       },
     );
+  } else {
+    if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        } else {
+          return const CircularProgressIndicator();
+      }
+  }});
   }
 }
