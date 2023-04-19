@@ -1,6 +1,8 @@
 package router
 
 import (
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -41,4 +43,31 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 
 	v := Vessel{Name: req.Name, Administrator: req.Administrator, Id: id.String()}
 	return c.JSON(http.StatusOK, v)
+}
+
+//get users in a vessel
+func (h *Handler) GetUsers(c echo.Context) error {
+
+	vessel_id := c.Param("vessel_id")
+
+	fmt.Printf("LOOKING UP USERS IN VESSEL '%s'\n", vessel_id)
+
+	//define the sql statement to use for this endpoint
+	q := `SELECT user_id FROM users_vessels WHERE vessel_id = $1`
+	rows := h.db.QueryRow(q, vessel_id)
+
+	var u User
+	err := rows.Scan(&u.UserName, &u.Email)
+	if err == nil {
+		if err == sql.ErrNoRows {
+			return c.String(http.StatusNotFound, "")
+		}
+ 
+		s, _ := json.MarshalIndent(u, "", "\t")
+		fmt.Println(string(s))
+		return c.JSONPretty(http.StatusOK, u, "\t")
+	}
+	fmt.Println("ERROR IS NOT NIL")
+	fmt.Println(err)
+	return c.String(http.StatusInternalServerError, "")
 }
