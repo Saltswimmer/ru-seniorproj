@@ -42,9 +42,11 @@ type User struct {
 	Email      string `json:"email"`
 }
 
+/* not needed anymore
 type getUserVesselsReq struct {
 	Id		  string `json:"user_id"`
 }
+*/
 
 //using searchVesselRow and searchVessel structs from vessel.go for response, since they are the same response structure
 
@@ -177,9 +179,11 @@ func (h *Handler) GetUserByToken(c echo.Context) error {
 func (h *Handler) GetUserVessels (c echo.Context) error {
 	fmt.Println("GETTING A USERS VESSEL LIST")
 
-	var req getUserVesselsReq
-	err := c.Bind(&req)
+	claims := util.GetClaimsFromRequest(c)
+
+	id, err := uuid.Parse(claims.MapClaims["user"].(string))
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -187,7 +191,7 @@ func (h *Handler) GetUserVessels (c echo.Context) error {
 
 	//define the sql statement to use for this endpoint
 	q := `SELECT name, users_vessels.vessel_id FROM users_vessels INNER JOIN vessels ON users_vessels.vessel_id = vessels.vessel_id WHERE user_id = $1`
-	rows, err := h.db.Query(q, req.Id)
+	rows, err := h.db.Query(q, id)
 	if err != nil {
 		return err
 	}

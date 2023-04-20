@@ -9,16 +9,17 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
 
 type newVesselReq struct {
 	Name          string `json:"name"`
-	Administrator string `json:"administrator"`
+	//Administrator string `json:"administrator"`
 }
 
 type Vessel struct {
 	Name          string `json:"name"`
-	Administrator string `json:"administrator"`
+	//Administrator string `json:"administrator"`
 	Id            string `json:"id"`
 }
 
@@ -32,8 +33,8 @@ type getVessel struct {
 }
 
 type joinVesselReq struct {
-	User_Id		  string `json:"user_id"`
-	Vessel		  string `json:"vessel"`
+	//User_Id		  string `json:"user_id"`
+	Vessel_Id		  string `json:"vessel_id"`
 }
 
 type usersInVesselReq struct {
@@ -71,6 +72,14 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 		return err
 	}
 
+	claims := util.GetClaimsFromRequest(c)
+
+	userId, err := uuid.Parse(claims.MapClaims["user"].(string))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	//define the sql statement to use for this endpoint
 	sql := `INSERT INTO vessels (vessel_id, name, date_created) VALUES ($1, $2, $3)`
 	date := time.Now()
@@ -88,7 +97,7 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	//just generate a new id i guess? doesnt really matter here
 	relationId := uuid.New()
 
-	_, err = h.db.Exec(sql, relationId.String(), id.String(), req.Administrator, "true", date)
+	_, err = h.db.Exec(sql, relationId.String(), id.String(), userId, "true", date)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("error in relationship table")
@@ -96,7 +105,7 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	}
 
 	//return vessel id
-	v := Vessel{Name: req.Name, Administrator: req.Administrator, Id: id.String()}
+	v := Vessel{Name: req.Name, Id: id.String()}
 	return c.JSON(http.StatusOK, v)
 
 }
@@ -135,13 +144,21 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 		return err
 	}
 
+	claims := util.GetClaimsFromRequest(c)
+
+	id, err := uuid.Parse(claims.MapClaims["user"].(string))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	//add the user to the server's user list
 	sql := `INSERT INTO users_vessels (user_vessel_id, vessel_id, user_id, is_admin, date_created) VALUES ($1, $2, $3, $4, $5)`
 	//just generate a new id i guess? doesnt really matter here
 	relationId := uuid.New()
 	date := time.Now()
 
-	_, err = h.db.Exec(sql, relationId.String(), req.Vessel, req.User_Id, "false", date)
+	_, err = h.db.Exec(sql, relationId.String(), req.Vessel_Id, id, "false", date)
 	if err != nil {
 		fmt.Println(err)
 		return err
