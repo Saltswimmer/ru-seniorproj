@@ -26,7 +26,6 @@ void main() {
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.white,
-        
       )),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

@@ -88,7 +88,8 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
 
     try {
-      _searchResults = await VesselService().search(_searchQuery, Session.token!);
+      _searchResults =
+          await VesselService().search(_searchQuery, Session.token!);
     } on Error catch (e) {
       print(e);
       return;
@@ -100,9 +101,9 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     super.initState();
     _controller = TextEditingController();
     _controller.addListener(() {
-          _searchQuery = _controller.text;
-          search();
-        });
+      _searchQuery = _controller.text;
+      search();
+    });
   }
 
   @override
@@ -151,7 +152,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
             child: Column(
           children: [
             Flexible(
-              flex: 1,
+              flex: 2,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -205,7 +206,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
               ),
             ),
             Expanded(
-              flex: 4,
+              flex: 8,
               child: DataTable(
                   columns: [
                     DataColumn(
@@ -219,7 +220,15 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                       .map<DataRow>((e) => DataRow(
                           cells: [DataCell(Text(e.name)), DataCell(Text('0'))]))
                       .toList()),
-            )
+            ),
+            Flexible(
+                flex: 1,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.add_box),
+                  label: TextTemplates.large(
+                      "Create a new vessel", colors.onSurface),
+                  onPressed: () => Routes.router.push("/vessel/new"),
+                ))
           ],
         )),
       ],
