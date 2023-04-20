@@ -64,7 +64,7 @@ class UserService {
 
   Future<List<Vessel>> getVessels(Token jwt) async {
     try {
-      final res = await dio.get('$server/restricted/getUsers', //<-- update for backend endpoint for vessels
+      final res = await dio.get('$server/restricted/getUsers',//<-- update for backend endpoint for vessels
           options: Options(headers: {'Authorization': jwt.toString()}));
 
       print(res.data);
