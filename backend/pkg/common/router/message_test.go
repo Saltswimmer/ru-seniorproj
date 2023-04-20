@@ -13,8 +13,8 @@ import (
 func TestCreateMessage(t *testing.T) {
 	sr := signupReq{FirstName: "Jim", MiddleName: "Bob", LastName: "Cooter", UserName: "jimbob", Email: "jimbob@foo.bar", Password: "pass"}
 	ar := DoSignup(sr, t)
-	userId := ParseUserIdFromToken(ar.AccessToken, t)
-	vr := newVesselReq{Name: "Example", Administrator: userId}
+	//userId := ParseUserIdFromToken(ar.AccessToken, t)
+	vr := newVesselReq{Name: "Example"}
 	req, rec := makeRequest(http.MethodPost, "/vessel/new", vr, ar.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	//fmt.Println(rec)
