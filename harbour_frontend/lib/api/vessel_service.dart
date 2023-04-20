@@ -4,6 +4,7 @@ import 'package:harbour_frontend/models/token.dart';
 import 'package:localstorage/localstorage.dart';
 
 import '../models/session.dart';
+import '../models/vessel_model.dart';
 
 class VesselService {
   final Dio dio = Dio();
@@ -12,10 +13,11 @@ class VesselService {
 
   VesselService();
 
-  Future<List<User>> getUsers(Token jwt) async {
+  Future<List<User>> getUsers(Token jwt, Vessel v) async {
     try {
-      final res = await dio.get('$server/restricted/getUsers',
-          options: Options(headers: {'Authorization': jwt.toString()}));
+      final res = await dio.get('$server/restricted/getUsers',  data: {"vessel": v.vessel_id},
+          options: Options(headers: {'Authorization': jwt.toString()})
+          );
 
       print(res.data);
       List<dynamic> data = res.data['users'];
