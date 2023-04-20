@@ -30,6 +30,18 @@ var testHandler *Handler
 func init() {
 	testHandler, _ = LoadHandler()
 	testEcho = LoadRouter(testHandler)
+
+
+
+	//seed database with some test data
+	//this will run every time the backend starts, so if you start it multiple times there will be multiple entries for each time it ran
+	err := SeedDatabase(testEcho)
+	if err != nil{
+		fmt.Println(err)
+		fmt.Println("error in seeding")
+	}
+
+
 }
 
 func LoadHandler() (*Handler, error) {
