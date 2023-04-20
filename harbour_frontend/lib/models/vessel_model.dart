@@ -10,8 +10,8 @@ class Vessel {
 
   factory Vessel.fromJson(Map json) {
     return Vessel(
-      vessel_id: json['Id'],
-      name: json['Vessel'],
+      vessel_id: json['id'],
+      name: json['name'],
     );
   }
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/api/vessel_service.dart';
+import 'package:harbour_frontend/models/session.dart';
+import 'package:harbour_frontend/models/token.dart';
+import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:harbour_frontend/text_templates.dart';
 
 class CreateVesselPage extends StatefulWidget {
@@ -43,30 +47,40 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
 
     return SafeArea(
         child: Scaffold(
-            body: Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        TextTemplates.headline("Create a new vessel", colors.onBackground),
-        TextFormField(
-          key: _formKey,
-          decoration: makeInputDecoration("Enter a name for the vessel"),
-          autocorrect: false,
-          enableSuggestions: false,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return "Please enter a name for the vessel";
-            }
-          },
-        ),
-        ElevatedButton(
-          child: TextTemplates.large("Create new vessel", colors.onSurface),
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              // Create the new vessel
-            }
-          },
-        )
-      ],
-    )));
+            body: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextTemplates.headline("Create a new vessel", colors.onBackground),
+                  TextFormField(
+                    controller: _controller,
+                    decoration: makeInputDecoration("Enter a name for the vessel"),
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a name for the vessel";
+                      }
+                    },
+                  ),
+                  ElevatedButton(
+                    child: TextTemplates.large("Create new vessel", colors.onSurface),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        // Create the new vessel
+                        try {
+                          Vessel? v = await VesselService()
+                              .createVessel(Session.token!, _controller.text);
+
+                          if (v != null) {}
+                        } on Error catch (e) {
+                          print(e);
+                        }
+                      }
+                    },
+                  )
+                ],
+    ))));
   }
 }

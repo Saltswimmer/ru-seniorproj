@@ -9,11 +9,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+
+  "github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
 
 type newVesselReq struct {
 	Name          string `json:"name"`
-	Administrator string `json:"administrator"`
 }
 
 type Vessel struct {
@@ -71,6 +72,14 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 		return err
 	}
 
+  claims := util.GetClaimsFromRequest(c)
+
+	adminId, err := uuid.Parse(claims.MapClaims["user"].(string))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	//define the sql statement to use for this endpoint
 	sql := `INSERT INTO vessels (vessel_id, name, date_created) VALUES ($1, $2, $3)`
 	date := time.Now()
@@ -88,7 +97,7 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	//just generate a new id i guess? doesnt really matter here
 	relationId := uuid.New()
 
-	_, err = h.db.Exec(sql, relationId.String(), id.String(), req.Administrator, "true", date)
+	_, err = h.db.Exec(sql, relationId.String(), id.String(), adminId, "true", date)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("error in relationship table")
@@ -96,7 +105,7 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	}
 
 	//return vessel id
-	v := Vessel{Name: req.Name, Administrator: req.Administrator, Id: id.String()}
+	v := Vessel{Name: req.Name, Id: id.String()}
 	return c.JSON(http.StatusOK, v)
 
 }
