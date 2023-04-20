@@ -54,7 +54,7 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	e.POST("/signup", handler.SignUp)
 	e.POST("/signin", handler.SignIn)
 	e.GET("/users/:id", handler.GetUser)
-  
+
 	config := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(util.UserTokenClaims)
@@ -62,18 +62,36 @@ func LoadRouter(handler *Handler) *echo.Echo {
 		SigningKey: util.SampleSecretKey,
 	}
 
-  user := e.Group("/user")
+	user := e.Group("/user")
 	user.Use(echojwt.WithConfig(config))
-  user.GET("/", handler.GetUserByToken)
-  user.GET("/getUserVessels", handler.GetUserVessels)
-  
-  vessel := e.Group("/vessel")
-  vessel.Use(echojwt.WithConfig(config))
-  vessel.POST("/new", handler.CreateVessel)
+	user.GET("/", handler.GetUserByToken)
+
+	// GET /vessels -OR- GET /user/vessels
+	user.GET("/getUserVessels", handler.GetUserVessels)
+	user.GET("/", handler.GetUserByToken)
+
+	// TODO: Need to rethink this routing
+	// vessel --> vessels
+	user.POST("/vessels/:id/messages", handler.CreateMessage)
+	user.GET("/vessels/:id/messages", handler.GetMessages)
+
+	vessel := e.Group("/vessel")
+	vessel.Use(echojwt.WithConfig(config))
+
+	// POST /vessels
+	vessel.POST("/new", handler.CreateVessel)
+
+	// GET /vessels/:id
 	vessel.GET("/", handler.GetVessel)
+
+	// POST /vessels/:id/join
 	vessel.POST("/join", handler.JoinVessel)
+
+	// GET /vessels/:id/members
 	vessel.GET("/members", handler.GetUsers)
-  vessel.GET("/search", handler.SearchVessels)
+
+	// GET /vessels/search?xxx=yyy
+	vessel.GET("/search", handler.SearchVessels)
 
 	return e
 }
