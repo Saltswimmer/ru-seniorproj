@@ -4,11 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:harbour_frontend/api/vessel_service.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/models/user_model.dart';
-import 'package:harbour_frontend/pages/vessel/vessel.dart';
-
-//THIS FILE IS CURRENTLY STANDALONE AND WILL HAVE TO BE INTEGRATED
-//TO INCLUDE THE CORRECT DATA STRUCTURES AND JSON REQUESTS FROM
-//VESSELS.dart FILE
 
 class UserList extends StatefulWidget {
 
