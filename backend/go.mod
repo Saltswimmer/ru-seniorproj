@@ -8,6 +8,7 @@ require (
 	github.com/labstack/echo-jwt/v4 v4.1.0
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/lib/pq v1.10.7
+	github.com/oklog/ulid/v2 v2.1.0
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/crypto v0.7.0
 )

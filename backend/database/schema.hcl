@@ -109,15 +109,19 @@ table "channels" {
 
 table "message" {
     schema = schema.public
-    column "message_id" {
+    column "id" {
         null = false
         type = text
     }
-    column "channel_id" {
+    column "body" {
         null = false
         type = text
     }
-    column "message_body" {
+    column "vessel_id" {
+        null = false
+        type = text
+    }
+    column "sender_id" {
         null = false
         type = text
     }
@@ -125,12 +129,8 @@ table "message" {
         null = false
         type = timestamp
     }
-    column "sender" {
-        null = false
-        type = text
-    }
     primary_key {
-        columns = [column.message_id]
+        columns = [column.id]
     }
 }
 
