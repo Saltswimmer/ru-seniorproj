@@ -214,10 +214,23 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                     DataColumn(
                         label: TextTemplates.large(
                             "Members", colors.onBackground)),
+                    DataColumn(
+                        label: TextTemplates.large(
+                            "Join", colors.onBackground)),
                   ],
                   rows: _searchResults
                       .map<DataRow>((e) => DataRow(
-                          cells: [DataCell(Text(e.name)), DataCell(Text('0'))]))
+                          cells: [DataCell(Text(e.name)), 
+                                  DataCell(Text('0')),
+                                  DataCell(
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          // Function when button is pressed
+                                        },
+                                        child: Text('Join Vessel'),
+                                      ),
+                                    ),
+                                  ]))
                       .toList()),
             )
           ],
