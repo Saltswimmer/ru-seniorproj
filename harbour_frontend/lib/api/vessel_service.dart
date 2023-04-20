@@ -25,7 +25,7 @@ class VesselService {
       return data.map((userJson) => User.fromJson(userJson)).toList();
     } on DioError catch (e) {
       print(e.message);
-      return Future.error(Exception('Unable to retrieve users'));
+      return Future.error(Exception('Unable to retrieve users from vessel'));
     }
   }
 
