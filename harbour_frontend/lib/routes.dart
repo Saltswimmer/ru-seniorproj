@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/pages/create_vessel.dart';
 
 import 'package:harbour_frontend/pages/landing.dart';
 import 'package:harbour_frontend/pages/credentials.dart';
 import 'package:harbour_frontend/pages/home.dart';
-import 'package:harbour_frontend/pages/logout.dart';
 import 'package:harbour_frontend/pages/vessel/vessel.dart';
+import 'package:provider/provider.dart';
 
 class Routes {
   static void reset() {
@@ -34,7 +35,13 @@ class Routes {
             GoRoute(
               path: 'logout',
               builder: (BuildContext context, GoRouterState state) =>
-                const Logout(),
+                  Consumer<Session>(builder: (context, session, child) {
+                Future.microtask(() {
+                  session.wipe();
+                  context.go('/login');
+                });
+                return Scaffold();
+              }),
             ),
             GoRoute(
               path: 'home',
@@ -47,17 +54,16 @@ class Routes {
                   const VesselPage(),
             ),
             GoRoute(
-              path: 'vessel',
-              builder: (BuildContext context, GoRouterState state) =>
-                  const VesselPage(),
-              routes: <RouteBase>[
-                GoRoute(
-                  path: 'new',
-                  builder: (BuildContext context, GoRouterState state) =>
-                      CreateVesselPage(),
-                ),
-              ]
-            )
+                path: 'vessel',
+                builder: (BuildContext context, GoRouterState state) =>
+                    const VesselPage(),
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'new',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        CreateVesselPage(),
+                  ),
+                ])
           ])
     ]);
   }

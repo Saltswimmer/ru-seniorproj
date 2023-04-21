@@ -70,12 +70,7 @@ func LoadRouter(handler *Handler) *echo.Echo {
 	user.GET("/getUserVessels", handler.GetUserVessels)
 	user.GET("/", handler.GetUserByToken)
 
-	// TODO: Need to rethink this routing
-	// vessel --> vessels
-	user.POST("/vessels/:id/messages", handler.CreateMessage)
-	user.GET("/vessels/:id/messages", handler.GetMessages)
-
-	vessel := e.Group("/vessel")
+		vessel := e.Group("/vessel")
 	vessel.Use(echojwt.WithConfig(config))
 
 	// POST /vessels
@@ -92,6 +87,11 @@ func LoadRouter(handler *Handler) *echo.Echo {
 
 	// GET /vessels/search?xxx=yyy
 	vessel.GET("/search", handler.SearchVessels)
+// TODO: Need to rethink this routing
+	// vessel --> vessels
+  vessel.POST("/send/:id", handler.CreateMessage)
+  vessel.GET("/messages/:id", handler.GetMessages)
+
 
 	return e
 }

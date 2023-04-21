@@ -33,8 +33,7 @@ type getVessel struct {
 }
 
 type joinVesselReq struct {
-	User_Id		  string `json:"user_id"`
-	Vessel		  string `json:"vessel"`
+	Id		  string `json:"vessel_id"`
 }
 
 type usersInVesselReq struct {
@@ -144,13 +143,20 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 		return err
 	}
 
+  claims := util.GetClaimsFromRequest(c)
+
+	userId, err := uuid.Parse(claims.MapClaims["user"].(string))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 	//add the user to the server's user list
 	sql := `INSERT INTO users_vessels (user_vessel_id, vessel_id, user_id, is_admin, date_created) VALUES ($1, $2, $3, $4, $5)`
 	//just generate a new id i guess? doesnt really matter here
 	relationId := uuid.New()
 	date := time.Now()
 
-	_, err = h.db.Exec(sql, relationId.String(), req.Vessel, req.User_Id, "false", date)
+	_, err = h.db.Exec(sql, relationId.String(), req.Id, userId, "false", date)
 	if err != nil {
 		fmt.Println(err)
 		return err

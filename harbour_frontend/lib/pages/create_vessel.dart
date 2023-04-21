@@ -5,6 +5,7 @@ import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:harbour_frontend/text_templates.dart';
+import 'package:provider/provider.dart';
 
 class CreateVesselPage extends StatefulWidget {
   @override
@@ -45,48 +46,51 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
   Widget build(BuildContext context) {
     colors = Theme.of(context).colorScheme;
 
-    return SafeArea(
-        child: Scaffold(
-            body: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    TextTemplates.headline(
-                        "Create a new vessel", colors.onBackground),
-                    TextFormField(
-                      controller: _controller,
-                      decoration:
-                          makeInputDecoration("Enter a name for the vessel"),
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please enter a name for the vessel";
-                        }
-                      },
-                    ),
-                    ElevatedButton(
-                      child: TextTemplates.large(
-                          "Create new vessel", colors.onSurface),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          // Create the new vessel
-                          try {
-                            Vessel? v = await VesselService()
-                                .createVessel(Session.token!, _controller.text);
-
-                            if (v != null) {
-                              Session.addVessel(v);
-                            }
-                          } on Error catch (e) {
-                            print(e);
+    return Consumer<Session>(builder: (context, session, child) {
+      return SafeArea(
+          child: Scaffold(
+              body: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TextTemplates.headline(
+                          "Create a new vessel", colors.onBackground),
+                      TextFormField(
+                        controller: _controller,
+                        decoration:
+                            makeInputDecoration("Enter a name for the vessel"),
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter a name for the vessel";
                           }
-                          Future.delayed(Duration.zero, () => context.pop());
-                        }
-                      },
-                    )
-                  ],
-                ))));
+                        },
+                      ),
+                      ElevatedButton(
+                        child: TextTemplates.large(
+                            "Create new vessel", colors.onSurface),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            // Create the new vessel
+                            try {
+                              Vessel? v = await VesselService()
+                                  .createVessel(session, _controller.text);
+
+                              if (v != null) {
+                                session.addVessel(v);
+                                session.currentVessel = v;
+                              }
+                            } on Error catch (e) {
+                              print(e);
+                            }
+                            Future.microtask(() => context.pushReplacement('/vessel'));
+                          }
+                        },
+                      )
+                    ],
+                  ))));
+    });
   }
 }
