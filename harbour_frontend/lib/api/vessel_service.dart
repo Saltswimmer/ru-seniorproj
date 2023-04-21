@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:harbour_frontend/models/user_model.dart';
 import 'package:harbour_frontend/models/token.dart';
@@ -30,10 +32,12 @@ class VesselService {
   Future<List<Vessel>> search(String name, Token jwt) async {
     try {
       final res = await dio.get('$server/vessel/search',
-          data: {'vessel_name': name},
+          data: {'name': name},
           options: Options(headers: {'Authorization': jwt.toString()}));
 
-      return (res.data['vessels'] as List<Map<dynamic, dynamic>>)
+      print(res.data['vessels']);
+      return (res.data['vessels'] as List<dynamic>)
+          .map((e) => e as Map<String, dynamic>)
           .map((e) => Vessel.fromJson(e))
           .toList();
     } on DioError catch (e) {

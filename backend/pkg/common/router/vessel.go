@@ -20,16 +20,16 @@ type newVesselReq struct {
 type Vessel struct {
 	Name          string `json:"name"`
 	Administrator string `json:"administrator"`
-	Id            string `json:"id"`
+	Id            string `json:"vessel_id"`
 }
 
 type getVesselReq struct {
-	Id			  string `json:"id"`
+	Id			  string `json:"vessel_id"`
 }
 
 type getVessel struct {
 	Name		  string `json:"name"`
-	Id			  string `json:"id"`
+	Id			  string `json:"vessel_id"`
 }
 
 type joinVesselReq struct {
@@ -52,11 +52,11 @@ type usersInVessel struct {
 }
 
 type searchVesselReq struct {
-	Slug		string `json:"vessel_name"`
+	Slug		string `json:"name"`
 }
 
 type searchVesselRow struct {
-	Vessel 		string `json:"vessel_name"`
+	Vessel 		string `json:"name"`
 	Id			string `json:"vessel_id"`
 }
 

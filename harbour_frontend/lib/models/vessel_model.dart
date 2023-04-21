@@ -10,13 +10,13 @@ class Vessel {
 
   factory Vessel.fromJson(Map json) {
     return Vessel(
-      vessel_id: json['id'],
+      vessel_id: json['vessel_id'],
       name: json['name'],
     );
   }
 
   Map toJson() => {
-    'Vessel': vessel_id,
-    'Id': name,
+    'vessel_id': vessel_id,
+    'name': name,
   };
 }

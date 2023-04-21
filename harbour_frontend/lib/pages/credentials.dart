@@ -1,12 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:harbour_frontend/routes.dart';
 
 class CredentialsPageMixin {
   late ColorScheme colors;
@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
                               'email': email,
                               'password': password,
                             });
-                            Routes.router.pushReplacement('/');
+                            context.go('/');
                           } on Exception catch (e) {
                             print(e.toString());
                             Session.upToDate = false;
@@ -181,7 +181,7 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
                 TextButton(
                   style: TextButton.styleFrom(
                       foregroundColor: colors.onBackground),
-                  onPressed: () => Routes.router.push('/register'),
+                  onPressed: () => context.push('/register'),
                   child: TextTemplates.medium(
                       "Don't have an account? Sign up!", colors.onBackground),
                 ),
@@ -329,7 +329,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
                           'username': username,
                           'password': password,
                         });
-                        Routes.router.pushReplacement('/');
+                        context.go('/');
                       } on Exception catch (e) {
                         print(e.toString());
                       }
@@ -339,7 +339,7 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
             ),
             TextButton(
               style: TextButton.styleFrom(foregroundColor: colors.onBackground),
-              onPressed: () => Routes.router.push('/login'),
+              onPressed: () => context.push('/login'),
               child: TextTemplates.medium(
                   "Already have an account? Sign in.", colors.onBackground),
             ),
