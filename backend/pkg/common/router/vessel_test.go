@@ -17,8 +17,8 @@ var firstUser util.AuthResponse
 func TestCreateVessel(t *testing.T) {
 	sr := signupReq{FirstName: "Jim", MiddleName: "Bob", LastName: "Cooter", UserName: "jimbob", Email: "jimbob@foo.bar", Password: "pass"}
 	ar := DoSignup(sr, t)
-	userId := ParseUserIdFromToken(ar.AccessToken, t)
-	vr := newVesselReq{Name: "Example", Administrator: userId}
+	//userId := ParseUserIdFromToken(ar.AccessToken, t)
+	vr := newVesselReq{Name: "Example"}
 	req, rec := makeRequest(http.MethodPost, "/vessel/new", vr, ar.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	//fmt.Println(rec)
@@ -40,10 +40,10 @@ func TestVesselFeaturesUgly(t *testing.T) {
 	sr := signupReq{FirstName: "John", MiddleName: "The", LastName: "Shipman", UserName: "shipdude", Email: "vesselfan13@example.com", Password: "pass"}
 	ar2 := DoSignup(sr, t)
 	firstUser = ar2
-	userId := ParseUserIdFromToken(ar2.AccessToken, t)
+	//userId := ParseUserIdFromToken(ar2.AccessToken, t)
 
 	//fmt.Println(vessel.Id)
-	vr3 := joinVesselReq{User_Id: userId, Vessel: vessel.Id}
+	vr3 := joinVesselReq{Vessel_Id: vessel.Id}
 	//fmt.Println(vr)
 	//fmt.Println(vr3)
 	req, rec := makeRequest(http.MethodPost, "/vessel/join", vr3, ar2.AccessToken)
@@ -73,9 +73,9 @@ func TestVesselFeaturesUgly(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 	//create 2 more servers
-	userId := ParseUserIdFromToken(firstUser.AccessToken, t)
+	//userId := ParseUserIdFromToken(firstUser.AccessToken, t)
 
-	vr := newVesselReq{Name: "Blackbeard's Flagship", Administrator: userId}
+	vr := newVesselReq{Name: "Blackbeard's Flagship"}
 	req, rec := makeRequest(http.MethodPost, "/vessel/new", vr, firstUser.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	//fmt.Println(rec)
@@ -90,7 +90,7 @@ func TestSearch(t *testing.T) {
 
 	assert.Equal(t, vr.Name, firstVessel.Name)
 
-	vr = newVesselReq{Name: "Bluebeard's Best Ship Ever", Administrator: userId}
+	vr = newVesselReq{Name: "Bluebeard's Best Ship Ever"}
 	req, rec = makeRequest(http.MethodPost, "/vessel/new", vr, firstUser.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	//fmt.Println(rec)
@@ -109,8 +109,8 @@ func TestSearch(t *testing.T) {
 	fmt.Println(rec)
 	assert.Equal(t, http.StatusOK, rec.Code)
 
-	vr3 := getUserVesselsReq{Id: userId}
-	req, rec = makeRequest(http.MethodGet, "/user/getUserVessels", vr3, firstUser.AccessToken)
+	//vr3 := getUserVesselsReq{Id: userId}
+	req, rec = makeRequest(http.MethodGet, "/user/getUserVessels", nil, firstUser.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	fmt.Println(rec)
 	assert.Equal(t, http.StatusOK, rec.Code)

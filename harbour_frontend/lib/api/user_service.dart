@@ -59,6 +59,7 @@ class UserService {
       if (data == null) {
         return null;
       }
+
       return data.map((vesselJson) => Vessel.fromJson(vesselJson)).toList();
     } on DioError catch (e) {
       print(e.message);

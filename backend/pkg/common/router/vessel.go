@@ -9,12 +9,12 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-
-  "github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
+	"github.com/Saltswimmer/ru-seniorproj/pkg/common/util"
 )
 
 type newVesselReq struct {
 	Name          string `json:"name"`
+	//Administrator string `json:"administrator"`
 }
 
 type Vessel struct {
@@ -71,9 +71,11 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 		return err
 	}
 
+
   claims := util.GetClaimsFromRequest(c)
 
 	adminId, err := uuid.Parse(claims.MapClaims["user"].(string))
+  
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -97,6 +99,7 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	relationId := uuid.New()
 
 	_, err = h.db.Exec(sql, relationId.String(), id.String(), adminId, "true", date)
+
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("error in relationship table")
@@ -143,13 +146,16 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 		return err
 	}
 
+
   claims := util.GetClaimsFromRequest(c)
 
 	userId, err := uuid.Parse(claims.MapClaims["user"].(string))
+
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
+
 	//add the user to the server's user list
 	sql := `INSERT INTO users_vessels (user_vessel_id, vessel_id, user_id, is_admin, date_created) VALUES ($1, $2, $3, $4, $5)`
 	//just generate a new id i guess? doesnt really matter here
@@ -157,6 +163,7 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 	date := time.Now()
 
 	_, err = h.db.Exec(sql, relationId.String(), req.Id, userId, "false", date)
+
 	if err != nil {
 		fmt.Println(err)
 		return err

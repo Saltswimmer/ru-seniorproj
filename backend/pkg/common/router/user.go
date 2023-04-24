@@ -42,9 +42,11 @@ type User struct {
 	Email      string `json:"email"`
 }
 
+/* not needed anymore
 type getUserVesselsReq struct {
 	Id		  string `json:"user_id"`
 }
+*/
 
 //using searchVesselRow and searchVessel structs from vessel.go for response, since they are the same response structure
 
@@ -177,7 +179,7 @@ func (h *Handler) GetUserByToken(c echo.Context) error {
 func (h *Handler) GetUserVessels (c echo.Context) error {
 	fmt.Println("GETTING A USERS VESSEL LIST")
 
-  claims := util.GetClaimsFromRequest(c)
+	claims := util.GetClaimsFromRequest(c)
 
 	id, err := uuid.Parse(claims.MapClaims["user"].(string))
 	if err != nil {

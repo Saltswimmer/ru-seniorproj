@@ -9,6 +9,7 @@ import 'package:harbour_frontend/models/vessel_model.dart';
 import 'package:localstorage/localstorage.dart';
 
 import '../models/session.dart';
+import '../models/vessel_model.dart';
 
 class VesselService {
   final Dio dio = Dio();
@@ -16,6 +17,7 @@ class VesselService {
   final String server = 'http://localhost:1323';
 
   VesselService();
+
 
   Future<List<User>> getUsers(Session session) async {
     try {
@@ -27,7 +29,7 @@ class VesselService {
       return data.map((userJson) => User.fromJson(userJson)).toList();
     } on DioError catch (e) {
       print(e.message);
-      return Future.error(Exception('Unable to retrieve users'));
+      return Future.error(Exception('Unable to retrieve users from vessel'));
     }
   }
 
