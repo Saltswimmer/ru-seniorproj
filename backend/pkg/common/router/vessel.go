@@ -19,22 +19,21 @@ type newVesselReq struct {
 
 type Vessel struct {
 	Name          string `json:"name"`
-	//Administrator string `json:"administrator"`
-	Id            string `json:"id"`
+	Administrator string `json:"administrator"`
+	Id            string `json:"vessel_id"`
 }
 
 type getVesselReq struct {
-	Id			  string `json:"id"`
+	Id			  string `json:"vessel_id"`
 }
 
 type getVessel struct {
 	Name		  string `json:"name"`
-	Id			  string `json:"id"`
+	Id			  string `json:"vessel_id"`
 }
 
 type joinVesselReq struct {
-	//User_Id		  string `json:"user_id"`
-	Vessel_Id		  string `json:"vessel_id"`
+	Id		  string `json:"vessel_id"`
 }
 
 type usersInVesselReq struct {
@@ -52,11 +51,11 @@ type usersInVessel struct {
 }
 
 type searchVesselReq struct {
-	Slug		string `json:"vessel_name"`
+	Slug		string `json:"name"`
 }
 
 type searchVesselRow struct {
-	Vessel 		string `json:"vessel_name"`
+	Vessel 		string `json:"name"`
 	Id			string `json:"vessel_id"`
 }
 
@@ -72,9 +71,11 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 		return err
 	}
 
-	claims := util.GetClaimsFromRequest(c)
 
-	userId, err := uuid.Parse(claims.MapClaims["user"].(string))
+  claims := util.GetClaimsFromRequest(c)
+
+	adminId, err := uuid.Parse(claims.MapClaims["user"].(string))
+  
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -97,7 +98,8 @@ func (h *Handler) CreateVessel(c echo.Context) error {
 	//just generate a new id i guess? doesnt really matter here
 	relationId := uuid.New()
 
-	_, err = h.db.Exec(sql, relationId.String(), id.String(), userId, "true", date)
+	_, err = h.db.Exec(sql, relationId.String(), id.String(), adminId, "true", date)
+
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("error in relationship table")
@@ -144,9 +146,11 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 		return err
 	}
 
-	claims := util.GetClaimsFromRequest(c)
 
-	id, err := uuid.Parse(claims.MapClaims["user"].(string))
+  claims := util.GetClaimsFromRequest(c)
+
+	userId, err := uuid.Parse(claims.MapClaims["user"].(string))
+
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -158,7 +162,8 @@ func (h *Handler) JoinVessel(c echo.Context) error {
 	relationId := uuid.New()
 	date := time.Now()
 
-	_, err = h.db.Exec(sql, relationId.String(), req.Vessel_Id, id, "false", date)
+	_, err = h.db.Exec(sql, relationId.String(), req.Id, userId, "false", date)
+
 	if err != nil {
 		fmt.Println(err)
 		return err

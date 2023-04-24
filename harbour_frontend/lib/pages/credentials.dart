@@ -1,12 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/models/token.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:harbour_frontend/api/user_service.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:harbour_frontend/routes.dart';
+import 'package:provider/provider.dart';
 
 class CredentialsPageMixin {
   late ColorScheme colors;
@@ -110,84 +111,87 @@ class _LoginPageState extends State<LoginPage> with CredentialsPageMixin {
   List<Widget> body(BuildContext context) {
     landingRedirect();
     return [
-      Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // EMAIL
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    autocorrect: false,
-                    cursorColor: colors.surface,
-                    enableSuggestions: false,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: makeInputDecoration('Enter your email'),
-                    controller: _email,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter an email address';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-
-                // PASSWORD
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    autocorrect: false,
-                    cursorColor: colors.surface,
-                    enableSuggestions: false,
-                    obscureText: true,
-                    decoration: makeInputDecoration('Enter your password'),
-                    controller: _password,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter a password';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-
-                // LOGIN BUTTON
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                      onPressed: () async {
-                        final email = _email.text;
-                        final password = _password.text;
-
-                        if (_formKey.currentState!.validate()) {
-                          try {
-                            UserService().signin({
-                              'email': email,
-                              'password': password,
-                            });
-                            Routes.router.pushReplacement('/');
-                          } on Exception catch (e) {
-                            print(e.toString());
-                            Session.upToDate = false;
+      Consumer<Session>(
+        builder: (context, session, child) {
+          return Form(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    // EMAIL
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        autocorrect: false,
+                        cursorColor: colors.surface,
+                        enableSuggestions: false,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: makeInputDecoration('Enter your email'),
+                        controller: _email,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter an email address';
                           }
-                        }
-                      },
-                      child: TextTemplates.large('Log in', colors.onSurface)),
+                          return null;
+                        },
+                      ),
+                    ),
+      
+                    // PASSWORD
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        autocorrect: false,
+                        cursorColor: colors.surface,
+                        enableSuggestions: false,
+                        obscureText: true,
+                        decoration: makeInputDecoration('Enter your password'),
+                        controller: _password,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter a password';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+      
+                    // LOGIN BUTTON
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            final email = _email.text;
+                            final password = _password.text;
+      
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                UserService().signin(session, {
+                                  'email': email,
+                                  'password': password,
+                                }).then((value) => context.go('/home'));
+                              } on Exception catch (e) {
+                                print(e.toString());
+                                session.upToDate = false;
+                              }
+                            }
+                          },
+                          child: TextTemplates.large('Log in', colors.onSurface)),
+                    ),
+                    TextButton(
+                      style: TextButton.styleFrom(
+                          foregroundColor: colors.onBackground),
+                      onPressed: () => context.push('/register'),
+                      child: TextTemplates.medium(
+                          "Don't have an account? Sign up!", colors.onBackground),
+                    ),
+                  ],
                 ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                      foregroundColor: colors.onBackground),
-                  onPressed: () => Routes.router.push('/register'),
-                  child: TextTemplates.medium(
-                      "Don't have an account? Sign up!", colors.onBackground),
-                ),
-              ],
-            ),
-          )),
+              ));
+        }
+      ),
     ];
   }
 }
@@ -228,123 +232,126 @@ class _RegisterPageState extends State<RegisterPage> with CredentialsPageMixin {
   @override
   List<Widget> body(BuildContext context) {
     return [
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(children: <Widget>[
-            // EMAIL
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                autocorrect: false,
-                cursorColor: colors.surface,
-                enableSuggestions: false,
-                keyboardType: TextInputType.emailAddress,
-                decoration: makeInputDecoration('Enter your email'),
-                controller: _email,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter an email address';
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            // USERNAME
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                autocorrect: false,
-                cursorColor: colors.surface,
-                enableSuggestions: false,
-                decoration: makeInputDecoration('What should people call you?'),
-                controller: _username,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a username';
-                  } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
-                    return 'Only Latin alphabet letters and underscores are allowed in usernames';
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            // PASSWORD
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                autocorrect: false,
-                cursorColor: colors.surface,
-                enableSuggestions: false,
-                obscureText: true,
-                decoration: makeInputDecoration('Enter your password'),
-                controller: _password,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            // CONFIRM PASSWORD
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                autocorrect: false,
-                cursorColor: colors.surface,
-                enableSuggestions: false,
-                obscureText: true,
-                decoration: makeInputDecoration('Enter your password'),
-                controller: _confirmPassword,
-                validator: (value) {
-                  if (value != _password.text) {
-                    return 'Both passwords must match';
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            // REGISTER BUTTON
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                  onPressed: () async {
-                    final email = _email.text;
-                    final username = _username.text;
-                    final password = _password.text;
-
-                    if (_formKey.currentState!.validate()) {
-                      try {
-                        UserService().signup({
-                          'first_name': '',
-                          'middle_name': '',
-                          'last_name': '',
-                          'email': email,
-                          'username': username,
-                          'password': password,
-                        });
-                        Routes.router.pushReplacement('/');
-                      } on Exception catch (e) {
-                        print(e.toString());
+      Consumer<Session>(
+        builder: (context, session, child) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(children: <Widget>[
+                // EMAIL
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: makeInputDecoration('Enter your email'),
+                    controller: _email,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter an email address';
                       }
-                    }
-                  },
-                  child: TextTemplates.large('Register', colors.onSurface)),
+                      return null;
+                    },
+                  ),
+                ),
+      
+                // USERNAME
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    decoration: makeInputDecoration('What should people call you?'),
+                    controller: _username,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a username';
+                      } else if (RegExp(r'[^a-zA-Z_]').hasMatch(value)) {
+                        return 'Only Latin alphabet letters and underscores are allowed in usernames';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+      
+                // PASSWORD
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    obscureText: true,
+                    decoration: makeInputDecoration('Enter your password'),
+                    controller: _password,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+      
+                // CONFIRM PASSWORD
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    autocorrect: false,
+                    cursorColor: colors.surface,
+                    enableSuggestions: false,
+                    obscureText: true,
+                    decoration: makeInputDecoration('Enter your password'),
+                    controller: _confirmPassword,
+                    validator: (value) {
+                      if (value != _password.text) {
+                        return 'Both passwords must match';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+      
+                // REGISTER BUTTON
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                      onPressed: () async {
+                        final email = _email.text;
+                        final username = _username.text;
+                        final password = _password.text;
+      
+                        if (_formKey.currentState!.validate()) {
+                          try {
+                            UserService().signup(session, {
+                              'first_name': '',
+                              'middle_name': '',
+                              'last_name': '',
+                              'email': email,
+                              'username': username,
+                              'password': password,
+                            }).then((value) => context.go('/home'));
+                          } on Exception catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                      },
+                      child: TextTemplates.large('Register', colors.onSurface)),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(foregroundColor: colors.onBackground),
+                  onPressed: () => context.push('/login'),
+                  child: TextTemplates.medium(
+                      "Already have an account? Sign in.", colors.onBackground),
+                ),
+              ]),
             ),
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: colors.onBackground),
-              onPressed: () => Routes.router.push('/login'),
-              child: TextTemplates.medium(
-                  "Already have an account? Sign in.", colors.onBackground),
-            ),
-          ]),
-        ),
+          );
+        }
       ),
     ];
   }

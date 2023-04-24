@@ -22,6 +22,8 @@ type NewMessage struct {
 type Message struct {
 	Id       string `json:"id"`
 	Body     string `json:"body"`
+  Sender   string `json:"sender"`
+  Timestamp     string `json:"timestamp"`
 	VesselId string `json:"vessel_id"`
 }
 
@@ -69,10 +71,10 @@ func (h *Handler) GetMessages(c echo.Context) error {
 	var rows *sql.Rows
 	var err error
 	if messageId != "" {
-		q := `SELECT id, body, vessel_id FROM message WHERE vessel_id = $1 AND id > $2 ORDER BY id LIMIT 100`
+		q := `SELECT m.id, m.vessel_id, m.body, s.username, m.date_created FROM message m JOIN users s ON (m.sender_id = s.user_id) WHERE m.vessel_id = $1 AND m.id > $2 ORDER BY m.id LIMIT 100`
 		rows, err = h.db.Query(q, vesselId, messageId)
 	} else {
-		q := `SELECT id, body, vessel_id FROM message WHERE vessel_id = $1 ORDER BY id DESC LIMIT 100`
+		q := `SELECT m.id, m.vessel_id, m.body, s.username, m.date_created FROM message m JOIN users s ON (m.sender_id = s.user_id) WHERE m.vessel_id = $1 ORDER BY m.id DESC LIMIT 100`
 		rows, err = h.db.Query(q, vesselId)
 	}
 	if err != nil {
@@ -84,7 +86,7 @@ func (h *Handler) GetMessages(c echo.Context) error {
 	for rows.Next() {
 		fmt.Println("\n\n!!! GOT MESAGES !!!")
 		var message Message
-		if err := rows.Scan(&message.Id, &message.Body, &message.VesselId); err != nil {
+		if err := rows.Scan(&message.Id, &message.VesselId, &message.Body, &message.Sender, &message.Timestamp); err != nil {
 			return err
 		}
 		messages = append(messages, message)

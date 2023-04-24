@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'models/session.dart';
 import 'routes.dart';
-import 'package:harbour_frontend/api/user_service.dart';
-import 'package:harbour_frontend/models/user_model.dart';
 
 void main() {
-  runApp(MaterialApp.router(
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create:
+      (context) => Session()
+    )
+  ], child:MaterialApp.router(
     title: 'Flutter Demo',
     theme: ThemeData(
         // This is the theme of your application.
@@ -26,7 +30,6 @@ void main() {
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.white,
-        
       )),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -50,7 +53,7 @@ void main() {
       ),
     ),
     routerConfig: Routes.router,
-  ));
+  )));
 }
 
 const ColorScheme scheme = ColorScheme.highContrastDark(

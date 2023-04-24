@@ -13,32 +13,33 @@ class UserService {
 
   UserService();
 
-  Future<void> signup(Map user) async {
+  Future<void> signup(Session session, Map user) async {
     try {
       final res = await dio.post('$server/signup', data: user);
       Token jwt = Token.fromJSON(res.data);
-      _beginSession(jwt);
+      session.begin(jwt);
     } on DioError catch (e) {
       print(e.message);
       return Future.error(Exception('Unable to register'));
     }
   }
 
-  Future<void> signin(Map credentials) async {
+  Future<void> signin(Session session, Map credentials) async {
     try {
       final res = await dio.post('$server/signin', data: credentials);
       Token jwt = Token.fromJSON(res.data);
-      _beginSession(jwt);
+      session.begin(jwt);
     } on DioError catch (e) {
       print(e.message);
       return Future.error(Exception('Unable to sign in'));
     }
   }
 
-  Future<User> getUser(Token jwt) async {
+  Future<User> getUser(Session session) async {
     try {
       final res = await dio.get('$server/user/',
-          options: Options(headers: {'Authorization': jwt.toString()}));
+          options:
+              Options(headers: {'Authorization': session.token.toString()}));
 
       return User.fromJson(res.data);
     } on DioError catch (e) {
@@ -47,28 +48,18 @@ class UserService {
     }
   }
 
-  void _beginSession(Token jwt) async {
+  Future<List<Vessel>?> getVessels(Session session) async {
     try {
-      final ls = LocalStorage('harbour.json');
-      //print(jwt.accessToken);
-      ls.setItem('access_token', jwt);
+      final res = await dio.get(
+          '$server/user/getUserVessels', //<-- update for backend endpoint for vessels
+          options:
+              Options(headers: {'Authorization': session.token.toString()}));
 
-      Session.token = jwt;
-      Session.user = await getUser(jwt);
-      Session.upToDate = true;
-    } catch (e) {
-      print(e.toString());
-      Session.upToDate = false;
-    }
-  }
+      List<dynamic>? data = res.data['vessels'];
+      if (data == null) {
+        return null;
+      }
 
-  Future<List<Vessel>> getVessels(Token jwt) async {
-    try {
-      final res = await dio.get('$server/restricted/getUsers',//<-- update for backend endpoint for vessels
-          options: Options(headers: {'Authorization': jwt.toString()}));
-
-      print(res.data);
-      List<dynamic> data = res.data['vessels'];
       return data.map((vesselJson) => Vessel.fromJson(vesselJson)).toList();
     } on DioError catch (e) {
       print(e.message);

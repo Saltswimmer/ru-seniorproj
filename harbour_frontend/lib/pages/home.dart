@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:harbour_frontend/api/user_service.dart';
 import 'package:harbour_frontend/api/vessel_service.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'dart:async';
-import 'package:harbour_frontend/models/token.dart';
-import 'package:harbour_frontend/models/user_model.dart';
-import 'package:harbour_frontend/routes.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:provider/provider.dart';
 
 import '../models/vessel_model.dart';
 
@@ -19,55 +18,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future<bool> validateSession() async {
-    late Token jwt;
-    try {
-      final ls = LocalStorage('harbour.json');
-
-      jwt = Token.fromJSON(ls.getItem('access_token'));
-    } catch (e) {
-      return Future.error(Exception('Access token not found'));
-    }
-
-    try {
-      return await Session.refresh()
-          .timeout(const Duration(seconds: 10), onTimeout: () => false);
-    } on Exception catch (e) {
-      return false;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: FutureBuilder<bool>(
-            future: Session.refresh(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data!) {
-                return HomepageWidget(user: Session.user!);
-              } else if (snapshot.hasData && !snapshot.data!) {
-                Routes.router.pushReplacement('/login');
-              } else if (snapshot.hasError) {
-                Future.delayed(const Duration(seconds: 5),
-                    () => Routes.router.pushReplacement('/login'));
-                return Text(snapshot.error.toString());
-              }
-              return Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints.tight(const Size.square(80)),
-                  child: const CircularProgressIndicator(
-                    strokeWidth: 6.0,
-                  ),
-                ),
-              );
-            }));
+    return Scaffold(body: HomepageWidget());
   }
 }
 
 class HomepageWidget extends StatefulWidget {
-  HomepageWidget({super.key, required this.user});
-
-  final User user;
+  const HomepageWidget({super.key});
 
   @override
   State<HomepageWidget> createState() => _HomepageWidgetState();
@@ -82,27 +40,19 @@ class _HomepageWidgetState extends State<HomepageWidget> {
 
   late final TextEditingController _controller;
 
-  List<Vessel> _searchResults = [];
+  List<Vessel> _vessels = [];
+  List<Vessel> _myVessels = [];
 
-  Future<void> search() async {
-    if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
-
-    try {
-      _searchResults = await VesselService().search(_searchQuery, Session.token!);
-    } on Error catch (e) {
-      print(e);
-      return;
-    }
-  }
+  late Future<void> Function() search;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
     _controller.addListener(() {
-          _searchQuery = _controller.text;
-          search();
-        });
+      _searchQuery = _controller.text;
+      search();
+    });
   }
 
   @override
@@ -114,7 +64,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
   void logout() {
     final ls = LocalStorage('harbour.json');
     ls.deleteItem('access_token');
-    Routes.router.pushReplacement('/login');
+    context.go('/login');
   }
 
   @override
@@ -123,106 +73,195 @@ class _HomepageWidgetState extends State<HomepageWidget> {
 
     final _formKey = GlobalKey<FormState>();
 
-    return Row(
-      children: [
-        LimitedBox(
-          maxWidth: 150,
-          child: Container(
-            color: colors.primary,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: CircleAvatar(
-                      backgroundColor: colors.onPrimary,
+    bool lock = Provider.of<Session>(context, listen: true).lock;
+
+    if (lock) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints.tight(const Size.square(80)),
+          child: const CircularProgressIndicator(strokeWidth: 6.0),
+        ),
+      );
+    }
+    return Consumer<Session>(builder: (context, session, child) {
+
+      search = () async {
+        if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
+
+        try {
+          List<Vessel> results =
+              await VesselService().search(session, _searchQuery);
+          setState(() {
+            _vessels = results;
+          });
+        } on Error catch (e) {
+          print(e);
+          return;
+        }
+      };
+
+      return Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Container(
+              color: colors.primary,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: CircleAvatar(
+                        maxRadius: 50,
+                        backgroundColor: colors.surface,
+                        child: TextTemplates.headline(
+                            session.user!.username[0], colors.onSurface),
+                      ),
                     ),
-                  ),
-                  TextTemplates.headline(
-                      Session.user!.username, colors.onPrimary)
-                ],
+                    FittedBox(
+                      child: TextTemplates.headline(
+                          session.user!.username, colors.onPrimary),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: ElevatedButton.icon(
+                          icon: Icon(Icons.logout),
+                          label:
+                              TextTemplates.large("Log out", colors.onSurface),
+                          onPressed: () {
+                            Future.microtask(() => context.go('/logout'));
+                          }),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-            child: Column(
-          children: [
-            Flexible(
-              flex: 1,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Flexible(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextTemplates.heavy(
-                          "Browse conversations", colors.onBackground),
-                      TextFormField(
-                        key: _formKey,
-                        controller: _controller,
-                        decoration: const InputDecoration(
-                            hintText: "Search for conversations"),
-                      ),
-                    ],
-                  )),
-                  Flexible(
-                    child: ListView(
-                      children: <CheckboxListTile>[
-                        CheckboxListTile(
-                            value: _onlyMine,
-                            title: TextTemplates.medium(
-                                "Only show your conversations",
-                                colors.onBackground),
-                            tileColor: colors.background,
-                            onChanged: (v) => setState(() {
-                                  if (v != null) _onlyMine = v;
-                                })),
-                        CheckboxListTile(
-                            value: _showVessels,
-                            title: TextTemplates.medium(
-                                "Show vessels", colors.onBackground),
-                            tileColor: colors.background,
-                            onChanged: (v) => setState(() {
-                                  if (v != null) _showVessels = v;
-                                })),
-                        CheckboxListTile(
-                            value: _showDMs,
-                            title: TextTemplates.medium(
-                                "Show direct message conversations",
-                                colors.onBackground),
-                            tileColor: colors.background,
-                            onChanged: (v) => setState(() {
-                                  if (v != null) _showDMs = v;
-                                })),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
+          Expanded(
               flex: 4,
-              child: DataTable(
-                  columns: [
-                    DataColumn(
-                        label:
-                            TextTemplates.large("Name", colors.onBackground)),
-                    DataColumn(
-                        label: TextTemplates.large(
-                            "Members", colors.onBackground)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  child: Column(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                  TextTemplates.heavy(
+                                      "Your conversations", colors.onBackground),
+                                  TextFormField(
+                                    autofocus: true,
+                                    key: _formKey,
+                                    controller: _controller,
+                                    decoration: const InputDecoration(
+                                        hintText: "Search for conversations"),
+                                  ),
+                                                            ],
+                                                          ),
+                                ),
+                              )),
+                          Flexible(
+                            child: ListView(
+                              children: <CheckboxListTile>[
+                                CheckboxListTile(
+                                    value: _onlyMine,
+                                    activeColor: colors.surface,
+                                    title: TextTemplates.medium(
+                                        "Only show your conversations",
+                                        colors.onBackground),
+                                    tileColor: colors.background,
+                                    onChanged: (v) => setState(() {
+                                          if (v != null) _onlyMine = v;
+                                        })),
+                                CheckboxListTile(
+                                    value: _showVessels,
+                                    activeColor: colors.surface,
+                                    title: TextTemplates.medium(
+                                        "Show vessels", colors.onBackground),
+                                    tileColor: colors.background,
+                                    onChanged: (v) => setState(() {
+                                          if (v != null) _showVessels = v;
+                                        })),
+                                CheckboxListTile(
+                                    value: _showDMs,
+                                    activeColor: colors.surface,
+                                    title: TextTemplates.medium(
+                                        "Show direct message conversations",
+                                        colors.onBackground),
+                                    tileColor: colors.background,
+                                    onChanged: (v) => setState(() {
+                                          if (v != null) _showDMs = v;
+                                        })),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 10,
+                      child: DataTable(
+                          showBottomBorder: true,
+                          columns: [
+                            DataColumn(
+                                label: TextTemplates.large(
+                                    "Name", colors.onBackground)),
+                            DataColumn(
+                                label: TextTemplates.large(
+                                    "       ", colors.onBackground)),
+                          ],
+                          rows: _vessels
+                              .map<DataRow>((e) => DataRow(cells: [
+                                    DataCell(Text(e.name)),
+                                    session.vessels!.containsKey(e.vessel_id)
+                                        ? DataCell(ElevatedButton(
+                                            child: Text("View"),
+                                            onPressed: () {
+                                              session.currentVessel = e;
+                                              Future.microtask(() =>
+                                                  context.push('/vessel'));
+                                            },
+                                          ))
+                                        : DataCell(ElevatedButton(
+                                            child: Text("Join"),
+                                            onPressed: () {
+                                              Future.microtask(() =>
+                                                  VesselService()
+                                                      .joinVessel(session, e)
+                                                      .then((value) {
+                                                    session.addVessel(e);
+                                                    session.currentVessel = e;
+                                                    context.push('/vessel');
+                                                  }));
+                                            },
+                                          ))
+                                  ]))
+                              .toList()),
+                    ),
+                    Flexible(
+                        flex: 1,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.add_box),
+                          label: TextTemplates.large(
+                              "Create a new vessel", colors.onSurface),
+                          onPressed: () => context.push("/vessel/new"),
+                        ))
                   ],
-                  rows: _searchResults
-                      .map<DataRow>((e) => DataRow(
-                          cells: [DataCell(Text(e.name)), DataCell(Text('0'))]))
-                      .toList()),
-            )
-          ],
-        )),
-      ],
-    );
+                ),
+              )),
+        ],
+      );
+    });
   }
 }
