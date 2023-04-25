@@ -99,15 +99,15 @@ func SeedDatabase(e *echo.Echo) error {
 
 	//now jacquelin can join both, while john will just join jim's
 
-	vr2 := joinVesselReq{Vessel_Id: jimShip.Id}
+	vr2 := joinVesselReq{Id: jimShip.Id}
 	req, rec = makeRequestMod(http.MethodPost, "/vessel/join", vr2, jac.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
-	vr2 = joinVesselReq{Vessel_Id: jimShip.Id}
+	vr2 = joinVesselReq{Id: jimShip.Id}
 	req, rec = makeRequestMod(http.MethodPost, "/vessel/join", vr2, john.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
-	vr2 = joinVesselReq{Vessel_Id: johnShip.Id}
+	vr2 = joinVesselReq{Id: johnShip.Id}
 	req, rec = makeRequestMod(http.MethodPost, "/vessel/join", vr2, jac.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 

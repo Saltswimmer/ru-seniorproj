@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/models/session.dart';
 import 'package:harbour_frontend/pages/create_vessel.dart';
 
-import 'package:harbour_frontend/pages/landing.dart';
 import 'package:harbour_frontend/pages/credentials.dart';
 import 'package:harbour_frontend/pages/home.dart';
 import 'package:harbour_frontend/pages/vessel/vessel.dart';
@@ -19,8 +18,31 @@ class Routes {
     return GoRouter(routes: <RouteBase>[
       GoRoute(
           path: '/',
-          builder: (BuildContext context, GoRouterState state) =>
-              const LandingPage(),
+          redirect: (context, state) async {
+            try {
+              Session session = Provider.of<Session>(context, listen: false);
+              if (!session.attemptedRestore) {
+                if (await session.restore()) {
+                  return '/home';
+                } else {
+                  return '/login';
+                }
+              }
+            } on Error catch (e) {}
+            return null;
+          },
+          builder: (BuildContext context, GoRouterState state) {
+            return Scaffold(
+              body: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints.tight(Size.square(80)),
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 6.0,
+                  ),
+                ),
+              ),
+            );
+          },
           routes: <RouteBase>[
             GoRoute(
               path: 'login',
@@ -31,17 +53,6 @@ class Routes {
               path: 'register',
               builder: (BuildContext context, GoRouterState state) =>
                   const RegisterPage(),
-            ),
-            GoRoute(
-              path: 'logout',
-              builder: (BuildContext context, GoRouterState state) =>
-                  Consumer<Session>(builder: (context, session, child) {
-                Future.microtask(() {
-                  session.wipe();
-                  context.go('/login');
-                });
-                return Scaffold();
-              }),
             ),
             GoRoute(
               path: 'home',

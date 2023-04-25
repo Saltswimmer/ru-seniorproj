@@ -61,12 +61,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     super.dispose();
   }
 
-  void logout() {
-    final ls = LocalStorage('harbour.json');
-    ls.deleteItem('access_token');
-    context.go('/login');
-  }
-
   @override
   Widget build(BuildContext context) {
     ColorScheme colors = Theme.of(context).colorScheme;
@@ -84,7 +78,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       );
     }
     return Consumer<Session>(builder: (context, session, child) {
-
       search = () async {
         if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
 
@@ -131,7 +124,8 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                           label:
                               TextTemplates.large("Log out", colors.onSurface),
                           onPressed: () {
-                            Future.microtask(() => context.go('/logout'));
+                            session.wipe();
+                            Future.microtask(() => context.go('/login'));
                           }),
                     ),
                   ],
@@ -153,13 +147,14 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                         children: [
                           Flexible(
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  child: Column(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                            children: [
-                                  TextTemplates.heavy(
-                                      "Your conversations", colors.onBackground),
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  TextTemplates.heavy("Your conversations",
+                                      colors.onBackground),
                                   TextFormField(
                                     autofocus: true,
                                     key: _formKey,
@@ -167,10 +162,10 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                     decoration: const InputDecoration(
                                         hintText: "Search for conversations"),
                                   ),
-                                                            ],
-                                                          ),
-                                ),
-                              )),
+                                ],
+                              ),
+                            ),
+                          )),
                           Flexible(
                             child: ListView(
                               children: <CheckboxListTile>[
