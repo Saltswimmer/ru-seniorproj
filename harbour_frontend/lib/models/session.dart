@@ -9,6 +9,7 @@ import 'user_model.dart';
 class Session extends ChangeNotifier {
   bool _upToDate = false;
   bool _lock = true;
+  bool _attemptedRestore = false;
   Token? _sessionToken;
   User? _sessionUser;
   Vessel? _sessionCurrentVessel;
@@ -16,6 +17,10 @@ class Session extends ChangeNotifier {
 
   bool get lock {
     return _lock;
+  }
+
+  bool get attemptedRestore {
+    return _attemptedRestore;
   }
 
   set upToDate(bool val) {
@@ -58,12 +63,12 @@ class Session extends ChangeNotifier {
     notifyListeners();
   }
 
-  void begin(Token jwt) async {
+  Future<bool> begin(Token jwt) async {
     try {
-      final ls = LocalStorage('harbour.json');
-      final UserService u = UserService();
-      //print(jwt.accessToken);
+      var ls = LocalStorage('harbour.json');
+      await ls.ready;
       ls.setItem('access_token', jwt);
+      final UserService u = UserService();
 
       _upToDate = true;
       _sessionToken = jwt;
@@ -81,16 +86,23 @@ class Session extends ChangeNotifier {
       _upToDate = false;
       _lock = true;
       notifyListeners();
+      return false;
     }
+    _attemptedRestore = false;
+    return true;
   }
 
-  void wipe() {
+  void wipe() async {
     _upToDate = false;
     _lock = true;
     _sessionToken = null;
     _sessionUser = null;
     _sessionCurrentVessel = null;
     _sessionVessels.clear();
+
+    var ls = LocalStorage('harbour.json');
+    await ls.ready;
+    ls.deleteItem('access_token');
     notifyListeners();
   }
 
@@ -98,7 +110,6 @@ class Session extends ChangeNotifier {
     late User user;
     try {
       user = await UserService().getUser(this);
-      print(user);
     } on Exception catch (e) {
       upToDate = false;
       notifyListeners();
@@ -108,5 +119,20 @@ class Session extends ChangeNotifier {
     upToDate = true;
     notifyListeners();
     return true;
+  }
+
+  Future<bool> restore() async {
+    _attemptedRestore = true;
+    try {
+      var ls = LocalStorage('harbour.json');
+      await ls.ready;
+      _sessionToken = Token.fromJSON(ls.getItem('access_token'));
+      _upToDate = true;
+
+      return await begin(_sessionToken!);
+    } on Error catch (e) {
+      print(e);
+      return false;
+    }
   }
 }
