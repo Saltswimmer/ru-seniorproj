@@ -23,6 +23,7 @@ class Routes {
               Session session = Provider.of<Session>(context, listen: false);
               if (!session.attemptedRestore) {
                 if (await session.restore()) {
+                  print(session.attemptedRestore);
                   return '/home';
                 } else {
                   return '/login';

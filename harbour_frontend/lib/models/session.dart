@@ -88,7 +88,6 @@ class Session extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    _attemptedRestore = false;
     return true;
   }
 
@@ -99,6 +98,7 @@ class Session extends ChangeNotifier {
     _sessionUser = null;
     _sessionCurrentVessel = null;
     _sessionVessels.clear();
+    _attemptedRestore = false;
 
     var ls = LocalStorage('harbour.json');
     await ls.ready;
