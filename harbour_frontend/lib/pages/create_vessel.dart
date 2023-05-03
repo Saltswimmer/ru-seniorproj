@@ -30,6 +30,8 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
   late final TextEditingController _controller;
   late ColorScheme colors;
 
+  bool makePublic = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +58,8 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
               ),
               body: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 375, maxHeight: 500),
+                  constraints:
+                      const BoxConstraints(maxWidth: 375, maxHeight: 500),
                   child: Form(
                       key: _formKey,
                       child: Column(
@@ -64,8 +67,8 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
                         children: [
                           TextFormField(
                             controller: _controller,
-                            decoration:
-                                makeInputDecoration("Enter a name for the vessel"),
+                            decoration: makeInputDecoration(
+                                "Enter a name for the vessel"),
                             autocorrect: false,
                             enableSuggestions: false,
                             validator: (value) {
@@ -74,6 +77,20 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
                               }
                             },
                           ),
+                          CheckboxListTile(
+                              value: makePublic,
+                              activeColor: colors.surface,
+                              title: TextTemplates.large(
+                                  "Make this vessel public",
+                                  colors.onBackground),
+                              subtitle: TextTemplates.medium(
+                                  "Anyone can join public vessels",
+                                  Colors.white38),
+                              onChanged: (val) {
+                                setState(() {
+                                  makePublic = val!;
+                                });
+                              }),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
@@ -84,8 +101,9 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
                                   // Create the new vessel
                                   try {
                                     Vessel? v = await VesselService()
-                                        .createVessel(session, _controller.text);
-                                
+                                        .createVessel(
+                                            session, _controller.text);
+
                                     if (v != null) {
                                       session.addVessel(v);
                                       session.currentVessel = v;
@@ -93,7 +111,8 @@ class _CreateVesselPageState extends State<CreateVesselPage> {
                                   } on Error catch (e) {
                                     print(e);
                                   }
-                                  Future.microtask(() => context.pushReplacement('/vessel'));
+                                  Future.microtask(
+                                      () => context.pushReplacement('/vessel'));
                                 }
                               },
                             ),
