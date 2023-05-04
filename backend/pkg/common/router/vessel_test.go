@@ -43,7 +43,7 @@ func TestVesselFeaturesUgly(t *testing.T) {
 	//userId := ParseUserIdFromToken(ar2.AccessToken, t)
 
 	//fmt.Println(vessel.Id)
-	vr3 := joinVesselReq{Vessel_Id: vessel.Id}
+	vr3 := joinVesselReq{Id: vessel.Id}
 	//fmt.Println(vr)
 	//fmt.Println(vr3)
 	req, rec := makeRequest(http.MethodPost, "/vessel/join", vr3, ar2.AccessToken)
