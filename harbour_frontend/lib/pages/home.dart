@@ -41,7 +41,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
   late final TextEditingController _controller;
 
   List<Vessel> _vessels = [];
-  List<Vessel> _myVessels = [];
 
   late Future<void> Function() search;
 
@@ -79,8 +78,13 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     }
     return Consumer<Session>(builder: (context, session, child) {
       search = () async {
-        if (_searchQuery.isEmpty || _searchQuery.length < 3) return;
-
+        if (_searchQuery.isEmpty || _searchQuery.length < 3) {
+          setState(() {
+            _vessels = session.vessels!.entries.map((e) => e.value).toList();
+          });
+          return;
+        }
+        ;
         try {
           List<Vessel> results =
               await VesselService().search(session, _searchQuery);

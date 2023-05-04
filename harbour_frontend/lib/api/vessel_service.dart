@@ -22,11 +22,12 @@ class VesselService {
   Future<List<User>> getUsers(Session session) async {
     try {
       final res = await dio.get('$server/vessel/members',
-          options: Options(headers: {'Authorization': session.toString()}));
+          data: {"vessel": session.currentVessel!.vessel_id},
+          options: Options(headers: {'Authorization': session.token.toString()}));
 
       print(res.data);
       List<dynamic> data = res.data['users'];
-      return data.map((userJson) => User.fromJson(userJson)).toList();
+      return data.map((userJson) => User.fromJson({"username":userJson["username"], "email":""})).toList();
     } on DioError catch (e) {
       print(e.message);
       return Future.error(Exception('Unable to retrieve users from vessel'));

@@ -51,7 +51,7 @@ class UserService {
   Future<List<Vessel>?> getVessels(Session session) async {
     try {
       final res = await dio.get(
-          '$server/user/getUserVessels', //<-- update for backend endpoint for vessels
+          '$server/user/getUserVessels',
           options:
               Options(headers: {'Authorization': session.token.toString()}));
 

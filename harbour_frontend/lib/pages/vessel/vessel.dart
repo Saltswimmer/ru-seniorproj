@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:harbour_frontend/models/session.dart';
+import 'package:harbour_frontend/pages/vessel/users-vessels.dart';
 import 'package:harbour_frontend/text_templates.dart';
 import 'package:provider/provider.dart';
 import 'chatpanel.dart';
@@ -37,12 +38,12 @@ class _VesselPageState extends State<VesselPage> {
               child: Row(
                   // columns go here
                   children: <Widget>[
-                Column(),
-                Expanded(child: ChatPanel()),
-                Column(),
-                // Expanded(
-                //     child:
-                //         UserList()) // <-- This needs the argument of having the user list of the current vessel passed in
+                
+                Expanded(child: ChatPanel(), flex: 4,),
+                
+                Expanded(
+                    child:
+                        UserList()) // <-- This needs the argument of having the user list of the current vessel passed in
               ])));
     });
   }
