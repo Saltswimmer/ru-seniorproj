@@ -37,7 +37,7 @@ type joinVesselReq struct {
 }
 
 type usersInVesselReq struct {
-	Vessel		string `json:"vessel"`
+	Vessel		string `query:"vessel"`
 }
 
 type userListMember struct {

@@ -22,7 +22,7 @@ class VesselService {
   Future<List<User>> getUsers(Session session) async {
     try {
       final res = await dio.get('$server/vessel/members',
-          data: {"vessel": session.currentVessel!.vessel_id},
+          queryParameters: {"vessel": session.currentVessel!.vessel_id},
           options: Options(headers: {'Authorization': session.token.toString()}));
 
       print(res.data);
