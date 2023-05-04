@@ -115,34 +115,34 @@ func SeedDatabase(e *echo.Echo) error {
 	//while poor john will be alone in his :(
 
 	newMessage := NewMessage{Body: "Hi folks!"}
-	path := fmt.Sprintf("/user/vessels/%s/messages", jimShip.Id)
+	path := fmt.Sprintf("/vessel/send/%s", jimShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, john.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	//fmt.Println(john.AccessToken)
 	//fmt.Println(req)
 
 	newMessage = NewMessage{Body: "What's up John"}
-	path = fmt.Sprintf("/user/vessels/%s/messages", jimShip.Id)
+	path = fmt.Sprintf("/vessel/send/%s", jimShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, jac.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
 	newMessage = NewMessage{Body: "Sup johnny!"}
-	path = fmt.Sprintf("/user/vessels/%s/messages", jimShip.Id)
+	path = fmt.Sprintf("/vessel/send/%s", jimShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, jim.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
 	newMessage = NewMessage{Body: "I'm having a great time with this chat app!"}
-	path = fmt.Sprintf("/user/vessels/%s/messages", jimShip.Id)
+	path = fmt.Sprintf("/vessel/send/%s", jimShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, john.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
 	newMessage = NewMessage{Body: "Hello?"}
-	path = fmt.Sprintf("/user/vessels/%s/messages", johnShip.Id)
+	path = fmt.Sprintf("/vessel/send/%s", johnShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, john.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 
 	newMessage = NewMessage{Body: "Anybody online?"}
-	path = fmt.Sprintf("/user/vessels/%s/messages", johnShip.Id)
+	path = fmt.Sprintf("/vessel/send/%s", johnShip.Id)
 	req, rec = makeRequestMod(http.MethodPost, path, newMessage, john.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 

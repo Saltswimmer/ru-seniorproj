@@ -25,7 +25,7 @@ func TestCreateMessage(t *testing.T) {
 	assert.NoError(t, json.Unmarshal(b, &vessel))
 
 	newMessage := NewMessage{Body: "Hello darkness my old friend"}
-	path := fmt.Sprintf("/user/vessels/%s/messages", vessel.Id)
+	path := fmt.Sprintf("/vessel/send/%s", vessel.Id)
 	req, rec = makeRequest(http.MethodPost, path, newMessage, ar.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	assert.Equal(t, http.StatusOK, rec.Code)
@@ -38,6 +38,7 @@ func TestCreateMessage(t *testing.T) {
 	assert.Equal(t, message.Body, "Hello darkness my old friend")
 	assert.Equal(t, message.VesselId, vessel.Id)
 
+	path = fmt.Sprintf("/vessel/messages/%s", vessel.Id)
 	req, rec = makeRequest(http.MethodGet, path, newMessage, ar.AccessToken)
 	testEcho.ServeHTTP(rec, req)
 	assert.Equal(t, http.StatusOK, rec.Code)
